@@ -1,43 +1,41 @@
 #!/usr/bin/env python
 
 import numpy as np
-from car_env import CarEnv
+from vehicle import CarEnv
 from DDPG import DDPG
 import matplotlib.pyplot as plt
 import time
-import math
 
+
+
+###ROS library
+#import rospy
+#import math
+#from std_msgs.msg import Float32
+#from std_msgs.msg import Int32MultiArray
 
 DISPLAY_REWARD_THRESHOLD=200
 env = CarEnv()
-s_dim = 2+env.O_LC
-a_dim = 1
-a_bound = env.action_bound[1]
+s_dim = 5+env.O_LC
+a_dim = 2
+a_bound =env.action_bound
 ddpg = DDPG(a_dim, s_dim, a_bound)
 ON_TRAIN=False
-t1 = time.time()
+t1_ = time.time()
 GLOBAL_RUNNING_R=[]
-def veiw_Qtable():
-    q_table=np.zeros((10,10))
-    for i in range(10):
-        for j in range(10):
-            s=np.hstack((np.array([j*40,360-i*40],dtype=np.float32)/400,\
-                         np.array(env.obs_line([j*40,360-i*40]),dtype=np.float32)/400))
-            a=ddpg.choose_action(s)
-            q_table[i][j]=math.degrees(a)
-    print(np.round(q_table,1))
-    
+
 def train():
  
-    RENDER=False
+    RENDER=True
     var = 1
-    MEMORY_CAPACITY = 10000
-    MAX_EPISODES = 1000
-    MAX_EP_STEPS = 100
+    MEMORY_CAPACITY = 1000
+    MAX_EPISODES = 100
+    MAX_EP_STEPS = 1000
     goood_job=0
-    ddpg.restore()
+    ddpg.restore() ########important
     for i in range(MAX_EPISODES):
-        s=env.reset()/400
+        t1 = time.time()
+        s=env.reset()
         ep_reward = 0
         for j in range(MAX_EP_STEPS):
             if RENDER:
@@ -45,9 +43,9 @@ def train():
     
             # Add exploration noise
             a = ddpg.choose_action(s)
-            a = np.clip(np.random.normal(a, var), *env.action_bound) 
+            a = np.random.normal(a, var)
             s_, r, done  = env.step(a)
-            ddpg.store_transition(s, a, r / 10, s_)
+            ddpg.store_transition(s, a, r , s_)
             if ddpg.pointer > MEMORY_CAPACITY:
                 var *= .9995    # decay the action randomness
                 ddpg.learn()
@@ -56,26 +54,55 @@ def train():
             
             ep_reward += r
             if j == MAX_EP_STEPS-1 or done==True :
-                print('Episode:', i, ' Reward: %i' % int(ep_reward), 'Explore: %.2f' % var, )
+                print('Episode:', i, ' Reward: %i' % int(ep_reward), 'Explore: %.2f' % var,'Running time: ', time.time() - t1 )
                 if len(GLOBAL_RUNNING_R) == 0: GLOBAL_RUNNING_R.append(ep_reward)
                 else: GLOBAL_RUNNING_R.append(GLOBAL_RUNNING_R[-1]*0.9+ep_reward*0.1)
-    #            veiw_Qtable()
-                if ep_reward>30 and i>500 :
-                    RENDER = False
-                    var=0
-                #    veiw_Qtable()
+                if i==100 or i>50 or i>200 or done==1:
+                    RENDER = True
+#                    var=0
                     goood_job+=1
                     print(goood_job)
                 else:
-                    if goood_job>0:
-                        goood_job-=1
+                    RENDER = False
+#                    if goood_job>0:
+#                        goood_job-=1
                 break
-#        if goood_job>20:
-#            break
+#        if ep_reward>30:
+        if goood_job>10:
+            break
     plt.plot(np.arange(len(GLOBAL_RUNNING_R)), GLOBAL_RUNNING_R)
     plt.xlabel('Episode'); plt.ylabel('Moving reward'); plt.ion(); plt.show()
-    print('Running time: ', time.time() - t1)
+    print('Running time: ', time.time() - t1_)
     ddpg.save()
+
+"""
+def callback(data):
+     global state
+     line=np.array(data.data,dtype=np.float32)/1000
+     main_vec=rospy.get_param('/AvoidChallenge/GoodAngle')
+     num_change=main_vec*3-180;
+     go_where_x=math.cos(num_change*math.pi/180);
+     go_where_y=math.sin(num_change*math.pi/180);
+     print(main_vec)
+#     line=np.array(data.data)
+     #print(line[0:120:6])
+     state=[]
+     state[0:1]=np.array([go_where_x,go_where_y])
+     state[2:11]=line[60:120:6]
+     state[12:21]=line[0:60:6]
+     state=np.array(state)
+     print(state)
+def ros_robot():
+    pub = rospy.Publisher('/motor_plan', Float32, queue_size=100)
+    rospy.Subscriber("/vision/BlackRealDis", Int32MultiArray, callback)
+    rospy.init_node('car_strage', anonymous=True)
+    rate = rospy.Rate(10) # 10hz
+    while not rospy.is_shutdown():
+        a = ddpg.choose_action(state)
+        pub.publish(a)
+
+"""
+
 
 def eval_():
     ddpg.restore()
@@ -85,14 +112,14 @@ def eval_():
     while True:
         s=env.reset()/400
         ep_reward = 0
-        for j in range(100):
+        for j in range(1000):
             env.render()
             a = ddpg.choose_action(s)
-            s, r, done = env.step(a)
+#            s, r, done  = env.step(a)
+            s, r, done  = env.step(a)
             ep_reward += r
-            if j == 99 or done==True :
+            if j == 999 or done==True :
                     print(' Reward: %i' % int(ep_reward) )
-                  #  veiw_Qtable()
                     break
 
 if ON_TRAIN:

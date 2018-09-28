@@ -1,4 +1,7 @@
 <launch> 
  <node name="usb_cam" pkg="usb_cam" type="usb_cam_node"/>
  <node name="image_listen" pkg="vision" type="vision_cov"/>
+ <node name="car_line" pkg="vision_pro" type="line"/>
+ <!--<node name="lsd_slam_viewer" pkg="lsd_slam_viewer" type="viewer"  respawn="true"/>-->
+ <node name="lsd_slam_core" pkg="lsd_slam_core" type="live_slam" args="image:=/usb_cam/image_raw camera_info:=/usb_cam/camera_info" respawn="true"/>
 </launch> 

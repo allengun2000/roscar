@@ -426,7 +426,7 @@ void gradient_compute() {
         }
     }
 
-    imshow("binary_img",binary_img);
+    // imshow("binary_img",binary_img);
 }
 
 void anglecompute(){
@@ -620,7 +620,7 @@ void ROI_II_feature() {
     Mat Roi_size = binary_img(cv::Rect(0, 120, 512, 168));
     haar_img.copyTo(Roi_size);
 
-    imshow("binary_img", binary_img);
+    // imshow("binary_img", binary_img);
 
     if (ROI_W > 0 && ROI_H > 0 && line_l[0].x>0 && vertex.y + 160>0 && ROI_W<288 && ROI_H<512 ) {
         // if (ROI_W > 0 && ROI_H > 0) {

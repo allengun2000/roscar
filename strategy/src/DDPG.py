@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import tensorflow as tf
 import numpy as np
 import gym
@@ -13,11 +12,11 @@ LR_A = 0.001    # learning rate for actor
 LR_C = 0.002    # learning rate for critic
 GAMMA = 0.9     # reward discount
 TAU = 0.01      # soft replacement
-MEMORY_CAPACITY = 10000
-BATCH_SIZE = 32
+MEMORY_CAPACITY = 100000
+BATCH_SIZE = 320
 
 RENDER = False
-ENV_NAME = 'CarRacing-v0'
+ENV_NAME = 'Pendulum-v0'
 
 
 ###############################  DDPG  ####################################

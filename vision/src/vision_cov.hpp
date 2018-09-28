@@ -11,3 +11,4 @@ using namespace std;
 using namespace cv;
 
 cv::Mat  Main_frame;
+cv::Mat  gray_image;
