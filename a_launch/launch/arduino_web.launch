@@ -1,0 +1,7 @@
+<launch> 
+ <!--<node name="usb_cam" pkg="usb_cam" type="usb_cam_node"/>-->
+ <node name="web_image" pkg="web_video_server" type="web_video_server"/>
+ <!--<node name="arduino" pkg="rosserial_arduino" type="serial_node.py"  args="/dev/ttyACM1"/>-->
+ <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+ <!--<node name="image_listen" pkg="vision" type="vision_cov"/>-->
+</launch> 

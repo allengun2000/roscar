@@ -20,7 +20,7 @@ s_dim = 5+env.O_LC
 a_dim = 2
 a_bound =env.action_bound
 ddpg = DDPG(a_dim, s_dim, a_bound)
-ON_TRAIN=False
+ON_TRAIN=True
 t1_ = time.time()
 GLOBAL_RUNNING_R=[]
 
@@ -29,7 +29,7 @@ def train():
     RENDER=True
     var = 1
     MEMORY_CAPACITY = 1000
-    MAX_EPISODES = 100
+    MAX_EPISODES = 50
     MAX_EP_STEPS = 1000
     goood_job=0
     ddpg.restore() ########important

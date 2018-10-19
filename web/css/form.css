@@ -1,0 +1,51 @@
+body {
+    background-color: DimGrey ;
+}
+h1{ color: #ggg;
+    font-family: verdana;
+    font-size: 300%;
+    text-align:center;
+text-align:center;background-color:#ddd;
+}
+
+
+table, tr, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    background-color: #f1f1c1;
+}
+tr {
+    padding: 45px;
+    text-align: left;    
+}
+canvas{
+width:480;height:300px;
+}
+label{
+font-size:5px;color:#000;
+}
+
+#AvoidanceWifi{
+font-size:41px;color:DimGrey;
+}
+#cin{
+font-size:35px;
+color:#f1f1c1;
+}
+.box {
+    float: left;
+    width: 800px;
+    
+    margin-left:80px;
+    padding: 10px;
+    height: 500px;
+
+}
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+a{
+color:#f1f1c1;
+}

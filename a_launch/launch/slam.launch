@@ -1,0 +1,6 @@
+<launch> 
+<node name="usb_cam" pkg="usb_cam" type="usb_cam_node"/>
+<node name="lsd_slam_core" pkg="lsd_slam_core" type="live_slam" args="image:=/usb_cam/image_raw camera_info:=/usb_cam/camera_info" respawn="true"/>
+<node name="orbslam" pkg="ORB_SLAM2" type="Mono" args="/home/allen/linux/catkin_ws/src/ORB_SLAM2/Vocabulary/ORBvoc.txt  /home/allen/linux/catkin_ws/src/ORB_SLAM2/Examples/Monocular/TUM1.yaml" respawn="true"/>
+<!--<node name="lsd_slam_viewer" pkg="lsd_slam_viewer" type="viewer"  respawn="true"/>-->
+</launch> 

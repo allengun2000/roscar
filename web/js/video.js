@@ -124,12 +124,17 @@
                     throw e;
                 }
             }
-	    self.stream.start();
+	    self.start = function() {
+                self.stream.start();
+            }
+            self.stop = function() {
+                self.stream.stop();
+            }
         };
         return module;
-
     })(MJPEG || {});
-
-    var player = new MJPEG.Player("player", "http://127.0.0.1:8080/stream?topic=/usb_cam/image_raw");
-    //var player = new MJPEG.Player("player", "http://" + document.getElementById("RobotIP").value + ":8080/stream?topic=/camera/image");
-    
+     //var player = new MJPEG.Player("player", "http://192.168.43.146:8080/stream?topic=/usb_cam/image_raw&type=ros_compressed");
+    //var player = new MJPEG.Player("player", "http://192.168.0.13:8080/stream?topic=/usb_cam/image_raw&type=ros_compressed");
+    //var player = new MJPEG.Player("player", "http://192.168.0.13:8080/stream?topic=/camera/image");
+    var player = new MJPEG.Player("player", "http://" + document.getElementById("RobotIP").value + ":8080/stream?topic=/usb_cam/image_raw&type=ros_compressed");
+    player.start();

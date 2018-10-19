@@ -1,0 +1,4 @@
+<launch> 
+ <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch" />
+ <node name="ORBslam" pkg="ORB_SLAM2" type="RGBD" args="/home/allen/linux/catkin_ws/src/ORB_SLAM2/Vocabulary/ORBvoc.txt  /home/allen/linux/catkin_ws/src/ORB_SLAM2/Examples/ROS/ORB_SLAM2/Kinect2.yaml"/>
+</launch>
