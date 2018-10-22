@@ -4,6 +4,7 @@
 #include <time.h>
 #include "geometry_msgs/Twist.h"
 #include "std_msgs/Int32.h"
+#include "std_msgs/Float32.h"
 #include <stdio.h>
 #include "cssl/cssl.h"
 #include "cssl/port.h"
@@ -14,9 +15,10 @@
 //====motor define=====
 
 std_msgs::Int32 rpm_info;
+std_msgs::Float32 PUU_info;
 
+int puu_control=0;
 cssl_t *serial;
-
 int State;
 
 //====================//
@@ -29,8 +31,17 @@ if(State==1){
 rpm_info.data = buf[3] * 256 + buf[4];
 if (rpm_info.data > 32767){
 	rpm_info.data = -(65535 - rpm_info.data + 1);}
+}else if(State==3){
+	PUU_info.data = buf[6]*256*256+buf[3] * 256 + buf[4];
+if (PUU_info.data > 8388608){
+	PUU_info.data = -(16777216 - PUU_info.data + 1);}
+PUU_info.data/=10000;
 }
 fflush(stdout);
+
+
+
+
 }
 //====================//
 //   cssl init        //
@@ -155,5 +166,17 @@ void motionfeedback(){
 	cssl_putchar(serial,0x64);
 	cssl_putchar(serial,0x0e);
     State=1;
+	mdelay(20);
+}
+void Puufeedback(){
+    cssl_putchar(serial,0x01);
+	cssl_putchar(serial,0x03);
+	cssl_putchar(serial,0x00);
+	cssl_putchar(serial,0x14);
+	cssl_putchar(serial,0x00);
+	cssl_putchar(serial,0x02);
+	cssl_putchar(serial,0x84);
+	cssl_putchar(serial,0x0f);
+    State=3;
 	mdelay(20);
 }

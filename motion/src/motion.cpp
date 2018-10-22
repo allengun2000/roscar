@@ -18,19 +18,27 @@ if(msg->linear.x==2)
     mcssl_send2motor(2000);
 if(msg->angular.z==2)
     mcssl_send2motor(-1000);
-if(msg->angular.z==-2)
+if(msg->angular.z==0 && msg->linear.x==0)
     mcssl_send2motor(0);
 }
+void PuuCallback(const std_msgs::Int32::ConstPtr& msg)
+{
+puu_control=msg->data;
 
+mcssl_send2motor(puu_control-PUU_info.data);
+}
 
 int main(int argc, char **argv)
 {
     //Initial
     ros::init(argc, argv, "motion");
     ros::NodeHandle n("~");
+    PUU_info.data=0;
     //motion subscriber
     ros::Subscriber motion_sub = n.subscribe("/turtle1/cmd_vel", 1, motionCallback);
-    ros::Publisher feedback_pub  = n.advertise<std_msgs::Int32>("/motorFB",0);
+    ros::Subscriber motion_sub1 = n.subscribe("/Puu_control", 1, PuuCallback);
+    ros::Publisher feedback_pub  = n.advertise<std_msgs::Int32>("/speedFB",0);
+    ros::Publisher feedback_pub1  = n.advertise<std_msgs::Float32>("/MotorFB",0);
     rpm_info.data=0;
         do{if(mcssl_init() > 0){
         break;
@@ -43,6 +51,8 @@ int main(int argc, char **argv)
     {
         motionfeedback();
         feedback_pub.publish(rpm_info);
+        Puufeedback();
+        feedback_pub1.publish(PUU_info);
         ros::spinOnce();
         loop_rate.sleep();
     }

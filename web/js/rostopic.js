@@ -5,8 +5,30 @@ var cmdVelTopic = new ROSLIB.Topic({
     messageType : 'geometry_msgs/Twist'
 });
 
-// These lines create a message that conforms to the structure of the Twist defined in our ROS installation
-// It initalizes all properties to zero. They will be set to appropriate values before we publish this message.
+var listener = new ROSLIB.Topic({
+  ros : ros,
+  name : '/MotorFB',
+  messageType : 'std_msgs/Float32'
+});
+var listener1 = new ROSLIB.Topic({
+  ros : ros,
+  name : '/speedFB',
+  messageType : 'std_msgs/Int32'
+});
+var PuuTopic = new ROSLIB.Topic({
+    ros : ros,
+    name : '/Puu_control',
+    messageType : 'std_msgs/Int32'
+});
+
+function pubPUU(value_puu) {
+var puu = new ROSLIB.Message({
+        data:Number(value_puu)
+    });
+PuuTopic.publish(puu);
+}
+
+function pubMessage(a) {
 var twist = new ROSLIB.Message({
     linear : {
         x : 0.0,
@@ -19,22 +41,8 @@ var twist = new ROSLIB.Message({
         z : 0.0
     }
 });
-
-/* This function:
- - retrieves numeric values from the text boxes
- - assigns these values to the appropriate values in the twist message
- - publishes the message to the cmd_vel topic.
- */
-function pubMessage(a) {
-    /**
-    Set the appropriate values on the twist message object according to values in text boxes
-    It seems that turtlesim only uses the x property of the linear object 
-    and the z property of the angular object
-    **/
     var linearX = 0.0;
     var angularZ = 0.0;
-
-    // get values from text input fields. Note for simplicity we are not validating.
 
 switch(a){
 case 0:
@@ -61,12 +69,15 @@ case 5:
     angularZ = 0; 
 break;
 }
-    // Set the appropriate values on the message object
     twist.linear.x = linearX;
     twist.angular.z = angularZ;
-    // Publish the message 
     cmdVelTopic.publish(twist);
 return
 }
-
+listener.subscribe(function(message) {
+	document.getElementById("MotorFb").innerText= message.data;
+	});
+listener1.subscribe(function(message) {
+	document.getElementById("SpeedFB").innerText= message.data;
+	});
 

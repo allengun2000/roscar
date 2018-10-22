@@ -87,10 +87,19 @@
 			<button id="sendMsg1" type="button" class="btn btn-primary btn-lg" onclick= "pubMessage(1)">up</button><br>
 			<button id="sendMsg3" type="button" class="btn btn-success btn-lg" onclick="pubMessage(3)">left</button>
 			<button id="sendMsg2" type="button" class="btn btn-warning btn-lg" onclick= "pubMessage(2)">down</button>
-			<button id="sendMsg4" type="button" class="btn btn-info btn-lg" onclick="pubMessage(4)">right</button>
+			<button id="sendMsg4" type="button" class="btn btn-info btn-lg" onclick="pubMessage(4)">right</button><br>
+			<button id="sendMsg4" type="button" class="btn btn-outline btn-lg" onclick="pubMessage(5)">stop</button>
 		</p>
 	</div>
-<img class="box" src="/home/allen/圖片/sixwheel.jpg">
+	<div class="box">
+	<label name="MotorFb">MotorFb:</label>
+	<label id="MotorFb">num</label><br></br>
+	<label name="SpeedFB">SpeedFB:</label>
+	<label id="SpeedFB">num</label><br></br>
+	<label name="PUUcontrol">PUUcontrol:</label>
+	<label id="PUUcontrol">0</label>
+	<input id="puucontrol" style="width:400px;" type="range" min="-1000" max="1000" value="0" oninput="showValue(this.value,'PUUcontrol');pubPUU(this.value);" />
+	</div>
 </div>
 <!--
 <label><input id="KeyboardControl" type="checkbox" onchange="keyboardcontrol(document.getElementById('KeyboardControl').checked)"> Keyboard Control</label>
@@ -113,4 +122,5 @@
 <script src="js/rosconect.js"></script>
 <script src="js/keyboard.js"></script>
 <script src="js/rostopic.js"></script>
+<script src="js/SliderControl.js"></script>
 </html>
