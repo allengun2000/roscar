@@ -41,8 +41,10 @@ int main(int argc, char **argv)
     ros::Subscriber motion_sub = n.subscribe("/turtle1/cmd_vel", 1, motionCallback);
     ros::Subscriber motion_sub1 = n.subscribe("/Puu_control", 1, PuuCallback);
     ros::Subscriber motion_sub3 = n.subscribe("/MotorSpeed", 1, MotorSpeedcall);
+    
     ros::Publisher feedback_pub  = n.advertise<std_msgs::Int32>("/speedFB",0);
     ros::Publisher feedback_pub1  = n.advertise<std_msgs::Float32>("/MotorFB",0);
+    ros::Publisher feedback_pub2  = n.advertise<std_msgs::Float32>("/MotorA",0);
     rpm_info.data=0;
         do{if(mcssl_init() > 0){
         break;
@@ -57,8 +59,11 @@ int main(int argc, char **argv)
         feedback_pub.publish(rpm_info);
         Puufeedback();
         feedback_pub1.publish(PUU_info);
+        Afeedback();
+        feedback_pub2.publish(A_info);
         ros::spinOnce();
         loop_rate.sleep();
+
     }
     //RS232 finish
     printf("Motion is stop\n");

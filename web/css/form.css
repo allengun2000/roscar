@@ -12,7 +12,7 @@ text-align:center;background-color:#ddd;
 table, tr, td {
     border: 1px solid black;
     border-collapse: collapse;
-    background-color: #f1f1c1;
+    background-color: #f1f1f1;
 }
 tr {
     padding: 45px;

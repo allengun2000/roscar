@@ -16,11 +16,10 @@
 
 std_msgs::Int32 rpm_info;
 std_msgs::Float32 PUU_info;
-
+std_msgs::Float32 A_info;
 int puu_control=0;
 cssl_t *serial;
 int State;
-
 //====================//
 //   cssl callback    //
 //====================//
@@ -36,6 +35,11 @@ if (rpm_info.data > 32767){
 if (PUU_info.data > 8388608){
 	PUU_info.data = -(16777216 - PUU_info.data + 1);}
 PUU_info.data/=10000;
+}else if(State==4){
+	A_info.data = buf[5]*256*256*256+buf[6] * 256 *256+ buf[3]*256 +buf[4];
+if (A_info.data > 2147483648){
+	A_info.data = -(4294967296 - A_info.data + 1);}
+A_info.data*=0.01;
 }
 fflush(stdout);
 
@@ -178,5 +182,18 @@ void Puufeedback(){
 	cssl_putchar(serial,0x84);
 	cssl_putchar(serial,0x0f);
     State=3;
+	mdelay(20);
+}
+
+void Afeedback(){
+    cssl_putchar(serial,0x01);
+	cssl_putchar(serial,0x03);
+	cssl_putchar(serial,0x00);
+	cssl_putchar(serial,0x16);
+	cssl_putchar(serial,0x00);
+	cssl_putchar(serial,0x02);
+	cssl_putchar(serial,0x25);
+	cssl_putchar(serial,0xcf);
+    State=4;
 	mdelay(20);
 }

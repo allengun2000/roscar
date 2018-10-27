@@ -66,8 +66,7 @@
     </div>
 <!--Wifi--><!--Wifi--><!--Wifi--><!--Wifi--><!--Wifi--><!--Wifi--><!--Wifi-->
 <div class="clearfix">
-<canvas class="box" id="player"> </canvas>
-<video class="box" controls><source src="/home/allen/影片/sixwheell.mp4" type="video/mp4"></video>
+
 
 	<div class="box">
 
@@ -80,8 +79,8 @@
 			</p>
 		</div>
 		<hr>
-		<a href="turtle.html"target="_blank">new</a>
-		<a href="turtle.html"target="_top">reflash</a>
+		<a href="golf.html"target="_blank">new</a>
+		<a href="golf.html"target="_top">reflash</a>
 		<form name="ctrlPanel">
 		<p style="text-align:center;">
 			<button id="sendMsg1" type="button" class="btn btn-primary btn-lg" onclick= "pubMessage(1)">up</button><br>
@@ -91,11 +90,61 @@
 			<button id="sendMsg4" type="button" class="btn btn-outline btn-lg" onclick="pubMessage(5)">stop</button>
 		</p>
 	</div>
+<canvas class="box" id="player"> </canvas>
+   <div class="box" id="ParameterDiv">
+                    <table>
+                        <tr>
+                            <td>hight</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="20" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SpeedLimitH</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="300" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SpeedLimitL</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="-300" />
+                            </td>
+                        </tr>
+     <!--                   <tr>
+                            <td>halfclose_dis</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="80" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>far_dis</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="250" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>gray_set</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="11" />
+                            </td>
+                        </tr>
+                        <tr>
+					-->
+                            <td colspan="2">
+                                <input type="Button" value="Sent" onclick="RosSaveParam();pubParmTopic(true);" />
+				<input type="Button" value="dump" onclick="pubParmTopic(false);" />
+                            </td>
+                        </tr> 
+                    </table>
+     </div> 
 	<div class="box">
 	<label name="MotorFb">MotorFb:</label>
 	<label id="MotorFb">num</label><br></br>
 	<label name="SpeedFB">SpeedFB:</label>
 	<label id="SpeedFB">num</label><br></br>
+	<label name="MotorA">MotorA:</label>
+	<label id="MotorA">num</label><br></br>
 	<label name="PUUcontrol">PUUcontrol:</label>
 	<label id="PUUcontrol">0</label>
 	<input id="puucontrol" style="width:400px;" type="range" min="-1000" max="1000" value="0" oninput="showValue(this.value,'PUUcontrol');pubPUU(this.value);" />
@@ -122,5 +171,6 @@
 <script src="js/rosconect.js"></script>
 <script src="js/keyboard.js"></script>
 <script src="js/rostopic.js"></script>
+<script src="js/rosparm.js"></script>
 <script src="js/SliderControl.js"></script>
 </html>
