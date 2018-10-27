@@ -32,9 +32,9 @@ void ParmIsChangeCallback(const std_msgs::Bool::ConstPtr& msg)
 		system("rosparam dump ~/linux/catkin_ws/src/a_launch/config/Parameter.yaml /golf");
 	}
 }
-void Parameter_getting(){
+void Parameter_getting(bool file){
 	ros::NodeHandle n;
-if(ifstream("Parameter.yaml")){
+if(file){
     system("rosparam load ~/linux/catkin_ws/src/a_launch/config/Parameter.yaml /golf");
     cout<<"read the YAML file"<<endl;
   }else{
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
     ros::Publisher num_pub = n.advertise<goood::num>("num", 1000);
 	ros::Rate loop_rate(10);
-	Parameter_getting();
+	Parameter_getting(1);
 	int count = 0;
 	while (ros::ok())
 	{
