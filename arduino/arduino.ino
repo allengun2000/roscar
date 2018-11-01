@@ -38,6 +38,7 @@ void setup()
   nh.advertise(p);
   nh.subscribe(sub);
   feedback.data_length=2;
+  feedback.data=(float *)malloc(sizeof(float)*2);
 }
 
 void loop()
