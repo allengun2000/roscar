@@ -123,7 +123,7 @@ SET(QT_DONT_USE_QTGUI TRUE)
 
 set(inc_dir 
 /usr/local/include
-/home/allen/testSD/tf/include
+include
 )
 set(opencv_q
  /usr/local/lib/libopencv_core.so
@@ -146,10 +146,14 @@ set(opencv_q
  /usr/local/lib/libopencv_videostab.so
 )
 set(tensorflow
- /usr/local/lib/libtensorflow_cc.so
- /usr/local/lib/libtensorflow_framework.so
- /usr/local/lib/libprotobuf.so
- /usr/local/lib/libprotobuf.a
+ #/usr/local/lib/libtensorflow_cc.so
+ #/usr/local/lib/libtensorflow_framework.so
+ #/usr/local/lib/libprotobuf.so
+ #/usr/local/lib/libprotobuf.a
+ /home/allen/linux/catkin_ws/src/vision_pro/include/libtensorflow_cc.so
+ /home/allen/linux/catkin_ws/src/vision_pro/include/libtensorflow_framework.so
+ /home/allen/linux/catkin_ws/src/vision_pro/include/libprotobuf.so
+ /home/allen/linux/catkin_ws/src/vision_pro/include/libprotobuf.a
 )
 ###########
 ## Build ##

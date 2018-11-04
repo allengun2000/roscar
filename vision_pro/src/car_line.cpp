@@ -20,10 +20,10 @@ int main(int argc, char *argv[])
    ros::init(argc, argv, "car_line");
 	ros::NodeHandle n;
 	ros::Subscriber sub = n.subscribe("pic_source", 10, chatterCallback);
-    VideoCapture capture("/home/allen/linux/car_line/model/20171017-182945CO.AVI");
+  //  VideoCapture capture("/home/allen/linux/car_line/model/20171017-182945CO.AVI");
 
     Status status = NewSession(SessionOptions(), &session);
-    std::string graph_filename="/home/allen/linux/car_line/model/model_0415.pb";
+    std::string graph_filename="/home/allen/linux/catkin_ws/src/vision_pro/model_0415.pb";
     LoadGraph(graph_filename, &session);
 
 //    std::string timepath="/home/nvidia/testSD/tensorflow_model/time.txt";
