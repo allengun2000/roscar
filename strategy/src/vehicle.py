@@ -1,10 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Sep 17 10:28:14 2018
-
-@author: USER
-"""
-
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-   
 
 
 import numpy as np
@@ -18,21 +13,21 @@ UNIT = 10   # pixels
 MAZE_H = 4  # grid height
 MAZE_W = 4  # grid width
 car_r=25
-O_LC=20
+O_LC=10
 dt=0.1
 carline_w=40
 ###################################################################
 class CarEnv(object):
     viewer = None
     wheel_yam_bound = [-math.pi/6, math.pi/6]
-    v_bound = [-100, 100]
-    point_bound =[30,970]    
+    v_bound = [0, 100]
+    point_bound =[30,1100]    
     goal_point=np.array([980,543])    
     def __init__(self):
         self.car_info=np.zeros(2, dtype=[('a', np.float32), ('l', np.float32),('w', np.float32),('yam',np.float32),('main_vec',np.float32)])
         self.car_info['a']=(30,30)  #x座標點 y座標點
         self.car_info['l']=(20,20)  #Lf=20 Lr=20 重心到車頭的長度 重心到車尾長度
-        self.car_info['w']=(3,15)  #車頭寬度及車車尾寬度
+        self.car_info['w']=(3,15)  #車頭寬度及車車尾寬度 24.5  34.5
         self.car_info['yam']=(0,0) #重心角度 車輪旋轉角度
         self.car_info['main_vec']=(0,0) #主向量x y
         self.o1_point=np.array([200,280])
@@ -40,15 +35,13 @@ class CarEnv(object):
         self.ran=math.pi
         self.obs_l=np.zeros(O_LC,dtype=np.float32)
         self.O_LC=O_LC
-        self.q=0
-        self.flag=0
-        self.small_line_dis=999
         self.raceline_1 ,self.raceline_2 ,self.raceline_XY=self.race_line()
         self.wheel_yam_a=0
         self.wheel_yam=math.radians(0)
         self.v = 3
         self.a=0
-        self.action_bound=np.array([1.,0.1])
+        self.action_bound=np.array([1.,1.])
+        self.max_x=0
     def step(self, action):
         done = False
         r = 0.
@@ -77,41 +70,53 @@ class CarEnv(object):
         self.obs_l[:],crash=self.obs_line()
         car_goal_vec=math.atan(v_goal[1]/v_goal[0])-self.car_info['yam'][0]
         s=np.hstack((v_goal/1000,self.obs_l/1000,self.car_info['yam'][1]*2,self.v/100,car_goal_vec)) #goal obsline wheelyam v car_goal_vec
-
+        
+        
         # done and reward
+##conut go on road
+        if self.max_x<self.car_info['a'][0] and crash==0:
+            self.max_x=self.car_info['a'][0]
+            r=abs(self.v/20)
+##road middle
+        if self.car_info['a'][0]<500:
+           y=math.cos(self.car_info['a'][0]/100)*150+400
+        if self.car_info['a'][0]>500:
+           y=self.car_info['a'][0]/5+ 343
+        r-=abs(self.car_info['a'][1]-y)/5000 
+#action change a lot
+        r-=np.sum(np.absolute(action))/1000
+#goal_dis
         goal_car_dis=np.hypot(*(self.car_info['a']-self.goal_point)) 
-        if crash==1:
-            r=-goal_car_dis/4000
-        else:
-            r=self.car_info['a'][0]/4000
-#        r-=np.sum(np.absolute(action))/1000
+        r-=goal_car_dis/40000
+#        print([abs(self.car_info['a'][1]-y)/5000,self.v/20,goal_car_dis/40000,np.sum(np.absolute(action))/100])
         if goal_car_dis<25+car_r:
-            done = True
+#            done = True
             r += 10.
         if crash==1:
 #            done = True
             r += -1.
-        if self.car_info['a'][0]==30 or self.car_info['a'][0]==970 \
-             or self.car_info['a'][1]==30 or self.car_info['a'][1]==970:
+#            print('crash')
+        if self.car_info['a'][0]==30 or self.car_info['a'][0]>1000 :
 #                done = True
                 r += -1.
-        return s, r, done
-
+#        print(r)
+        return s, r, done ,self.wheel_yam,self.v
+        # return s, r, done 
 
     def race_line(self):
         race_line=[]
-        race_lineXY=np.zeros((1040,2), dtype=np.float32)
-        count=0
+        race_lineXY=np.zeros((1100,2), dtype=np.float32)
+
         for i in np.linspace(0,500,1000,endpoint=False):
            y=math.cos(i/100)*150+400
            race_line.append(i)
            race_line.append(y)
-           count+=1
+#           count+=1
         for i in np.linspace(500,1000,1000,endpoint=False):
            y=i/5+ 343
            race_line.append(i)
            race_line.append(y)
-           count+=1
+#           count+=1
         line_dot_v=[]
         line_dot_v2=[]
         line_dot_v.append(race_line)
@@ -185,11 +190,12 @@ class CarEnv(object):
         self.car_info['yam']=(math.radians(-20),0)
         self.v = 1
         self.a=0
+        self.max_x=0
         v_goal=(self.goal_point-self.car_info['a'])
         self.obs_l[:],_=self.obs_line()
         car_goal_vec=math.atan(v_goal[1]/v_goal[0])-self.car_info['yam'][0]
         s=np.hstack((v_goal/1000,self.obs_l/1000,self.car_info['yam'][1]*2,self.v/100,car_goal_vec)) #goal obsline wheelyam v car_goal_vec
-
+        
         return s
     
     def render(self):
@@ -200,17 +206,9 @@ class CarEnv(object):
 #        self.ran-=0.1
 #        if self.ran<-math.pi:
 #            self.ran=math.pi
-#        return np.random.rand(2)+2  # two radians
-        if self.q>-60 and self.flag==0:
-            self.flag=0
-            self.q-=1
-        elif self.q<60 :
-#            self.flag=1
-            self.q+=1
-        else:
-            self.flag=0
-        self.ran=math.radians(self.q)
-        return np.array([0,0])
+#        return np.random.rand(2)  # two radians
+
+        return np.array([0.3,0])
         
 
 class Viewer(pyglet.window.Window):
@@ -218,7 +216,7 @@ class Viewer(pyglet.window.Window):
 
     def __init__(self,goal_point,car_point,car_line_dot,car_line_dot2,obs_line):
         # vsync=False to not use the monitor FPS, we can speed up training
-        super(Viewer, self).__init__(width=1000, height=800, resizable=True, caption='gooood_car', vsync=False)
+        super(Viewer, self).__init__(width=1100, height=800, resizable=True, caption='gooood_car', vsync=False)
         self.car_point_=car_point['a']
         self.car_point_l=car_point['l']
         self.car_point_w=car_point['w']

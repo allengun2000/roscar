@@ -96,11 +96,47 @@
                         <tr>
                             <td>hight</td>
                             <td>
-                                <input type="text" name="ParameterElement" value="20" />
+                                <input type="text" name="ParameterElement" value="13.5" >
+				<!--label id="height_l">0</label>
+				<input type="range" min="0" max="20" name="ParameterElement" value="2.5" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'height_l');" -->
+                            </td>
+                        </tr>
+			<tr>
+                            <td>angle</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="2.5" >
+				<!--label id="angle_l">0</label>
+				<input type="range" min="-10" max="10" name="ParameterElement" value="2.5" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'angle_l');" -->
+                            </td>
+                        </tr>
+			<tr>
+                            <td>world_x</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="60" />
+                            </td>
+                        </tr>
+			<tr>
+                            <td>world_y</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="800" />
+                            </td>
+                        </tr>
+			<tr>
+                            <td>Kx</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="1650" >
+				<!--input type="range" min="200" max="1800" name="ParameterElement" value="200" oninput="RosSaveParam();pubParmTopic(true);" /-->
+                            </td>
+                        </tr>
+			<tr>
+                            <td>Ky</td>
+                            <td>
+				<input type="text" name="ParameterElement" value="1650" >
+                                <!--input type="range" min="200" max="1800" name="ParameterElement" value="200" oninput="RosSaveParam();pubParmTopic(true);" /-->
                             </td>
                         </tr>
                         <tr>
-                            <td>SpeedLimitH</td>
+         <!--                     <td>SpeedLimitH</td>
                             <td>
                                 <input type="text" name="ParameterElement" value="300" />
                             </td>
@@ -111,7 +147,7 @@
                                 <input type="text" name="ParameterElement" value="-300" />
                             </td>
                         </tr>
-     <!--                   <tr>
+                      <tr>
                             <td>halfclose_dis</td>
                             <td>
                                 <input type="text" name="ParameterElement" value="80" />
@@ -130,7 +166,8 @@
                             </td>
                         </tr>
                         <tr>
-					-->
+
+			-->
                             <td colspan="2">
                                 <input type="Button" value="Sent" onclick="RosSaveParam();pubParmTopic(true);" />
 				<input type="Button" value="dump" onclick="pubParmTopic(false);" />

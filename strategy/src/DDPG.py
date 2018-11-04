@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import tensorflow as tf
 import numpy as np
 import gym
@@ -12,8 +13,8 @@ LR_A = 0.001    # learning rate for actor
 LR_C = 0.002    # learning rate for critic
 GAMMA = 0.9     # reward discount
 TAU = 0.01      # soft replacement
-MEMORY_CAPACITY = 100000
-BATCH_SIZE = 320
+MEMORY_CAPACITY = 10000
+BATCH_SIZE = 350
 
 RENDER = False
 ENV_NAME = 'Pendulum-v0'
@@ -79,15 +80,17 @@ class DDPG(object):
     def _build_a(self, s, reuse=None, custom_getter=None):
         trainable = True if reuse is None else False
         with tf.variable_scope('Actor', reuse=reuse, custom_getter=custom_getter):
-            net = tf.layers.dense(s, 300, activation=tf.nn.relu, name='l1', trainable=trainable)
-            net = tf.layers.dense(net, 300, activation=tf.nn.relu, name='l2', trainable=trainable)
+            net = tf.layers.dense(s, 500, activation=tf.nn.relu, name='l1', trainable=trainable)
+            net = tf.layers.dense(net, 500, activation=tf.nn.relu, name='l2', trainable=trainable)
+            net = tf.layers.dense(net, 500, activation=tf.nn.relu, name='l3', trainable=trainable)
+            net = tf.layers.dense(net, 500, activation=tf.nn.relu, name='l4', trainable=trainable)
             a = tf.layers.dense(net, self.a_dim, activation=tf.nn.tanh, name='a', trainable=trainable)
             return tf.multiply(a, self.a_bound, name='scaled_a')
 
     def _build_c(self, s, a, reuse=None, custom_getter=None):
         trainable = True if reuse is None else False
         with tf.variable_scope('Critic', reuse=reuse, custom_getter=custom_getter):
-            n_l1 = 300
+            n_l1 = 500
             s_n1 = tf.layers.dense(s , n_l1, activation=tf.nn.relu, name='l1_s', trainable=trainable)
             w1_s = tf.get_variable('w1_s', [n_l1, n_l1], trainable=trainable)
             w1_a = tf.get_variable('w1_a', [self.a_dim, n_l1], trainable=trainable)
