@@ -123,6 +123,10 @@ SET(QT_DONT_USE_QTGUI TRUE)
 
 set(inc_dir 
 /usr/local/include
+<<<<<<< HEAD
+=======
+#/home/allen/testSD/tf/include
+>>>>>>> b76f04f4ae3cc3a92a249bcdea25cd2d75888b04
 include
 )
 set(opencv_q

@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 
 #include "ros/ros.h"
-#include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
 #include "vision/image_cv.h"
 #include <tensorflow/core/public/session.h>
 #include <tensorflow/core/platform/env.h>
@@ -116,3 +116,62 @@ void anglecompute();
 
 int img_h;
 int img_w;
+int world_x = 60;
+int world_y = 800;
+float heigh = 13.5;
+float angle = 2.5;
+int Kx = 1650;
+int Ky = 1650;
+
+
+cv::Mat worldcoordinate(cv::Mat img){
+int xsize = img_w;
+int ysize = img_h;
+
+	Mat ipm_img = Mat::zeros(cv::Size(world_x, world_y), CV_8UC3);
+	
+	for (uint16_t i = 0; i < world_y; i++) {
+		uchar* ipm_data = ipm_img.ptr<uchar>(i);
+		for (uint16_t j = 0; j < world_x; j++) {
+			float xx = xsize / 2 + Kx * (j - (world_x / 2)) / ((world_y - i)*cos(angle*M_PI / 180) + heigh * sin(angle * M_PI / 180));
+			float yy = ysize / 2 - Ky * ((world_y - i)*sin(angle * M_PI / 180) - heigh * cos(angle * M_PI / 180)) / ((world_y - i)*cos(angle * M_PI / 180) - heigh * sin(angle * M_PI / 180));
+			if (xx > 0 && xx < xsize && yy>0 && yy < ysize) {
+				ipm_data[j * 3 + 0] = img.at<Vec3b>(yy, xx)[0];
+				ipm_data[j * 3 + 1] = img.at<Vec3b>(yy, xx)[1];
+				ipm_data[j * 3 + 2] = img.at<Vec3b>(yy, xx)[2];
+			}
+		}
+	}
+
+	return ipm_img;
+}
+void ParmIsChangeCallback(const std_msgs::Bool::ConstPtr& msg)
+{
+	ros::NodeHandle n;
+	if(msg->data){
+    n.getParam("/golf/high",heigh);
+	n.getParam("/golf/angle",angle);
+	n.getParam("/golf/Kx",Kx);
+	n.getParam("/golf/Ky",Ky);
+	n.getParam("/golf/world_x",world_x);
+	n.getParam("/golf/world_y",world_y);
+	// cout<<"read parm"<<endl;
+}else{
+		system("rosparam dump ~/linux/catkin_ws/src/a_launch/config/Parameter.yaml /golf");
+	}
+}
+void Parameter_getting(bool file){
+	ros::NodeHandle n;
+if(file){
+    system("rosparam load ~/linux/catkin_ws/src/a_launch/config/Parameter.yaml /golf");
+    cout<<"read the YAML file"<<endl;
+  }else{
+	n.setParam("/golf/high",13.5);
+	n.setParam("/golf/angle",2.5);
+	n.setParam("/golf/Kx",1650);
+	n.setParam("/golf/Ky",1650);
+	n.setParam("/golf/world_x",60);
+	n.setParam("/golf/world_y",800);
+	system("rosparam dump ~/linux/catkin_ws/src/a_launch/config/Parameter.yaml /golf");
+  }
+}

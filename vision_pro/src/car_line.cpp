@@ -20,15 +20,18 @@ int main(int argc, char *argv[])
    ros::init(argc, argv, "car_line");
 	ros::NodeHandle n;
 	ros::Subscriber sub = n.subscribe("pic_source", 10, chatterCallback);
-  //  VideoCapture capture("/home/allen/linux/car_line/model/20171017-182945CO.AVI");
 
+    Parameter_getting(1);
+
+  //  VideoCapture capture("/home/allen/linux/car_line/model/20171017-182945CO.AVI");
+    ros::Subscriber sub_parm = n.subscribe("/ParmIsChange", 10, ParmIsChangeCallback);
     Status status = NewSession(SessionOptions(), &session);
     std::string graph_filename="/home/allen/linux/catkin_ws/src/vision_pro/model_0415.pb";
     LoadGraph(graph_filename, &session);
 
 //    std::string timepath="/home/nvidia/testSD/tensorflow_model/time.txt";
 //    fd.open(timepath,std::ios::out | ios::app);
-
+ 
     CvMat lowerBound;
     CvMat upperBound;
     float minRange[] = { -1.5, -1.5, -800, 172, 112 };
@@ -123,44 +126,26 @@ int main(int argc, char *argv[])
                         drawline(line_r, &Roi, Scalar(0, 100, 255));
 
                 if (!line_l.empty())
-                        drawline(line_l, &Roi, Scalar(105, 0, 255));
+                        drawline(line_l, &Roi, Scalar(0, 100, 255));
                 Roi.copyTo(Roi_size);
 
                 line_l.clear();
                 line_r.clear();
-                //imshow("Roi_size",Roi_size);
+                // imshow("Roi_size",Roi_size);
             }
         }
-
+        resize(frame_resize,frame_resize,cv::Size(img_w,img_h),CV_INTER_LINEAR);
+        frame_resize=worldcoordinate(frame_resize);
         imshow("capture",frame_resize);
         frame_resize.release();
         //imwrite("capture.png",frame_resize);
         //imwrite("capture2.png",img_1);
         waitKey(1);
 
-        /*if(count1==11){
-            count1=0;
-            count2++;
 
-            char* filename;
-            char* filename1;
-            char* filename2;
-
-            //sprintf(filename,"/home/nvidia/testSD/tensorflow_model/or/Or%d.png",count2);
-            //imwrite(filename,frame);
-            //sprintf(filename1,"/home/nvidia/testSD/tensorflow_model/Re/Re%d.png",count2);
-            //imwrite(filename1,frame_resize);
-            //sprintf(filename2,"/home/nvidia/testSD/tensorflow_model/Line/Line%d.png",count2);
-            //imwrite(filename2,Lineim);
-            //imwrite("/home/nvidia/testSD/tensorflow_model/Re/Re"+ count1 + ".jpg",frame_resize);
-            //imwrite("/home/nvidia/testSD/tensorflow_model/Line/"+ count1 + ".jpg",Lineim);
-
-        }*/
         end_time=clock();
         total_time=(float)(end_time-start_time)/CLOCKS_PER_SEC;
-        // printf("Time : %f sec \n", total_time);
 
-//        fd<<fixed<<total_time<<"\r\n";
 loop_rate.sleep();
 
     }
@@ -244,7 +229,7 @@ void learning_model(){
             img_data[j]= prediction(i*width + j)*255;
         }
     }
-    //imshow("train",img_output);
+    // imshow("train",img_output);
 
     GpuMat Goutput(img_output);
 
@@ -263,10 +248,10 @@ void learning_model(){
     Mat Roi_size = binary_img(cv::Rect(0, 120, 512, 168));
     learning_img.copyTo(Roi_size);
 
-    /*Mat temp;
-    cvtColor(binary_img,temp,CV_GRAY2BGR);
-    bitwise_or(temp,frame_resize,temp);
-    imshow("learning_img",temp);*/
+    // Mat temp;
+    // cvtColor(binary_img,temp,CV_GRAY2BGR);
+    // bitwise_or(temp,frame_resize,temp);
+    // imshow("learning_img",temp);
 }
 
 void gradient() {
@@ -321,7 +306,7 @@ void gradient() {
         }
     }
 
-    //imshow("edge_img.png, edge_img);
+    //imshow("edge_img", edge_img);
     //imwrite("edge_img.png",edge_img);
     int g, k = 0;
     for (uint16_t f = 0; f < 90; f++) {
@@ -505,7 +490,7 @@ void ROI_I_feature() {
             }
         }
     }
-    //imshow("haar_img", haar_img);
+    // imshow("haar_img", haar_img);
 
     //----------------RANSAC--------------------
     vector<cv::Point2f> samplepoint_r;
@@ -587,18 +572,18 @@ void ROI_I_feature() {
     if (direction_angle[1] < 0)
         direction_angle[1] += 180;
 
-    /*Mat haar_img_rgb;
+    // Mat haar_img_rgb;
 
-    Mat Roi_size = haar_img(cv::Rect(0,40,512,128));
-    cvtColor(Roi_size, haar_img_rgb, CV_GRAY2RGB);
+    // Mat Roi_size = haar_img(cv::Rect(0,40,512,128));
+    // cvtColor(Roi_size, haar_img_rgb, CV_GRAY2RGB);
 
-    if (!line_r.empty())
-            drawline(line_r, &haar_img_rgb, Scalar(0, 255, 255));
+    // if (!line_r.empty())
+    //         drawline(line_r, &haar_img_rgb, Scalar(0, 255, 255));
 
-    if (!line_l.empty())
-            drawline(line_l, &haar_img_rgb, Scalar(255, 0, 0));*/
+    // if (!line_l.empty())
+    //         drawline(line_l, &haar_img_rgb, Scalar(255, 0, 0));
 
-     //imshow("haar_img_rgb", haar_img_rgb);
+    //  imshow("haar_img_rgb", haar_img_rgb);
     //imwrite("haar_img_rgb.png",haar_img_rgb);
     lanefeacture_r.clear();
     lanefeacture_l.clear();
@@ -745,8 +730,8 @@ void houghtransfer() {
     Vvp = VH;
     //line(img_, cv::Point(0, VH), cv::Point(frame.cols, VH), CV_RGB(255, 0, 0), 2, CV_AA);
     //imwrite("vsline.png",img_);
-    /*imshow("img_r", img_r);
-    imshow("img_l", img_l);*/
+    // imshow("img_r", img_r);
+    // imshow("img_l", img_l);
 }
 
 void estimateroadparameter() {
@@ -1359,7 +1344,7 @@ float getangle(cv::Point pointO, cv::Point pointA)
 
     if (x_ != 0) {
         angle = atan2(y_, x_);//y / x
-        angle = angle / CV_PI * 180;//©·«×Ž«Ššš€«×theta
+        angle = angle / CV_PI * 180;
         if (angle < 0) {
             angle = angle + 180;
         }

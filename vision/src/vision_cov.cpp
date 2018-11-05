@@ -34,7 +34,8 @@ int main(int argc, char *argv[])
   // cv::namedWindow("Images");
 	// cv::startWindowThread();
   image_transport::ImageTransport it(n);
-  image_transport::Subscriber sub_image = it.subscribe("usb_cam/image_raw", 1, imageCallback);
+  // image_transport::Subscriber sub_image = it.subscribe("usb_cam/image_raw", 1, imageCallback);
+	image_transport::Subscriber sub_image = it.subscribe("usb_cam/image_raw", 1, imageCallback,ros::VoidPtr(),image_transport::TransportHints("compressed"));
   image_transport::Publisher pub_image = it.advertise("camera/image", 1);
 	ros::Publisher pic_pub = n.advertise<vision::image_cv>("pic_source", 1);
   sensor_msgs::ImagePtr msg_image;
@@ -65,7 +66,7 @@ while (ros::ok())
 		pic_pub.publish(pic_source);
 		// if(gray_image.cols>2){cv::imshow("Images", gray_image);}
 		if(Main_frame.cols>2){cv::imshow("Images", Main_frame);}
-    cv::waitKey(10);
+    cv::waitKey(1);
 		loop_rate.sleep();
 		++count;
 	}

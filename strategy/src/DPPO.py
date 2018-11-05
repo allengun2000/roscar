@@ -5,7 +5,7 @@ from tensorflow.contrib.distributions import Normal
 import numpy as np
 import matplotlib.pyplot as plt
 import threading, queue
-from vehicle import CarEnv
+from car_env import CarEnv
 
 tf.reset_default_graph()
 EP_MAX = 1000
@@ -20,9 +20,9 @@ EPSILON = 0.2               # Clipped surrogate objective
 n_model = 1
 
 env = CarEnv()
-S_DIM = 5+env.O_LC
-A_DIM = 2
-A_BOUND = env.action_bound
+S_DIM = 2+env.O_LC
+A_DIM = 1
+A_BOUND = env.action_bound[1]
 
 
 class PPO(object):

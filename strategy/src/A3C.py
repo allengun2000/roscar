@@ -22,14 +22,14 @@ import multiprocessing
 import threading
 import tensorflow as tf
 import numpy as np
-from vehicle import CarEnv
+from car_env import CarEnv
 import matplotlib.pyplot as plt
 
 # np.random.seed(1)
 # tf.set_random_seed(1)
 tf.reset_default_graph()
 MAX_GLOBAL_EP = 1000
-MAX_EP_STEP = 1000
+MAX_EP_STEP = 100
 UPDATE_GLOBAL_ITER = 5
 N_WORKERS = multiprocessing.cpu_count()
 LR_A = 1e-4  # learning rate for actor
@@ -44,8 +44,8 @@ GLOBAL_EP = 0
 
 
 env = CarEnv()
-N_S = 5+env.O_LC
-N_A = 2
+N_S = 2+env.O_LC
+N_A = 1
 A_BOUND = env.action_bound
 del env
 
@@ -73,7 +73,7 @@ class ACNet(object):
 
                 with tf.name_scope('wrap_a_out'):
                     self.test = sigma[0]
-                    mu, sigma = mu * A_BOUND, sigma + 1e-5
+                    mu, sigma = mu * A_BOUND[1], sigma + 1e-5
 
                 normal_dist = tf.contrib.distributions.Normal(mu, sigma)
 
