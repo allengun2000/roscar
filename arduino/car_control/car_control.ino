@@ -34,8 +34,8 @@ void setup()
   nh.subscribe(c_wheel);
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW); 
-  car_msg.data_length=10;
-  car_msg.data = (float *)malloc(sizeof(float)*10);
+  car_msg.data_length=2;
+  car_msg.data = (float *)malloc(sizeof(float)*2);
 }
 
 void loop()

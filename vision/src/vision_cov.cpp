@@ -1,9 +1,5 @@
 #include "vision_cov.hpp"
 
-void chatterCallback(const std_msgs::String::ConstPtr& msg)
-{
-	ROS_INFO("I heard: [%s]", msg->data.c_str());
-}
 void imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
   cv_bridge::CvImagePtr cv_ptr;

@@ -111,6 +111,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
+  include ${catkin_INCLUDE_DIRS}
   include 
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
@@ -205,3 +206,13 @@ target_link_libraries(vision_cov
 
 # add_executable(line src/car_line.cpp)
 # target_link_libraries(line ${tensorflow} ${opencv_q} Qt5::Widgets)
+
+
+add_executable(road
+  src/road.cpp
+)
+add_dependencies(road ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(road
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)

@@ -21,9 +21,8 @@ int main(int argc, char *argv[])
 	ros::NodeHandle n;
 	ros::Subscriber sub = n.subscribe("pic_source", 10, chatterCallback);
     Parameter_getting(1);
-
-    VideoCapture capture("/home/allen/linux/car_line/model/20171017-182945CO.AVI");
     ros::Subscriber sub_parm = n.subscribe("/ParmIsChange", 10, ParmIsChangeCallback);
+    VideoCapture capture("/home/allen/linux/car_line/model/20171017-182945CO.AVI");
     Status status = NewSession(SessionOptions(), &session);
     std::string graph_filename="/home/allen/linux/car_line/model/model_0415.pb";
     LoadGraph(graph_filename, &session);

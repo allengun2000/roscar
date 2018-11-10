@@ -91,6 +91,34 @@ Ky.get(function(value) {
     }
 });
 //=========================================================================
+var hsv = new ROSLIB.Param({
+    ros: ros,
+    name: '/golf/hsv'
+});
+function ParamhsvSet() {
+    var box = []
+    obj = document.getElementsByName('ParameterElement');
+    box.push(parseFloat(obj[6].value)); 
+    box.push(parseFloat(obj[7].value)); 
+    box.push(parseFloat(obj[8].value)); 
+    box.push(parseFloat(obj[9].value)); 
+    box.push(parseFloat(obj[10].value)); 
+    box.push(parseFloat(obj[11].value)); 
+    hsv.set(box);
+
+}
+hsv.get(function(value) {
+    if (value != null) {
+        obj = document.getElementsByName("ParameterElement");
+            obj[6].value = value[0];
+	    obj[7].value = value[1];
+	    obj[8].value = value[2];
+	    obj[9].value = value[3];
+            obj[10].value = value[4];
+	    obj[11].value = value[5];
+    }
+});
+//=========================================================================
 /*var speedlimit = new ROSLIB.Param({
     ros: ros,
     name: '/golf/speedlimit'
@@ -119,6 +147,7 @@ function RosSaveParam() {
     Paramworld_ySet();
     ParamKxSet();
     ParamKySet();
+    ParamhsvSet();
     //ParamSpeedLimitSet();
 }
 

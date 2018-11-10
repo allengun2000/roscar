@@ -136,38 +136,48 @@
                             </td>
                         </tr>
                         <tr>
-         <!--                     <td>SpeedLimitH</td>
+                             <td>Hmax</td>
                             <td>
-                                <input type="text" name="ParameterElement" value="300" />
+                                <label id="Hmax">360</label>
+				<input type="range" min="0" max="360" name="ParameterElement" value="360" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'Hmax');">
                             </td>
                         </tr>
                         <tr>
-                            <td>SpeedLimitL</td>
+                            <td>Hmin</td>
                             <td>
-                                <input type="text" name="ParameterElement" value="-300" />
+                                <label id="Hmin">0</label>
+				<input type="range" min="0" max="360" name="ParameterElement" value="0" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'Hmin');">
                             </td>
                         </tr>
                       <tr>
-                            <td>halfclose_dis</td>
+                            <td>Smax</td>
                             <td>
-                                <input type="text" name="ParameterElement" value="80" />
+                                <label id="Smax">255</label>
+				<input type="range" min="0" max="255" name="ParameterElement" value="255" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'Smax');">
                             </td>
                         </tr>
                         <tr>
-                            <td>far_dis</td>
+                            <td>Smin</td>
                             <td>
-                                <input type="text" name="ParameterElement" value="250" />
+                                <label id="Smin">0</label>
+				<input type="range" min="0" max="255" name="ParameterElement" value="0" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'Smin');">
                             </td>
                         </tr>
                         <tr>
-                            <td>gray_set</td>
+                            <td>Vmax</td>
                             <td>
-                                <input type="text" name="ParameterElement" value="11" />
+                                <label id="Vmax">255</label>
+				<input type="range" min="0" max="255" name="ParameterElement" value="255" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'Vmax');">
+                            </td>
+                        </tr>
+			<tr>
+                            <td>Vmin</td>
+                            <td>
+                                <label id="Vmin">0</label>
+				<input type="range" min="0" max="255" name="ParameterElement" value="0" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'Vmin');">
                             </td>
                         </tr>
                         <tr>
-
-			-->
                             <td colspan="2">
                                 <input type="Button" value="Sent" onclick="RosSaveParam();pubParmTopic(true);" />
 				<input type="Button" value="dump" onclick="pubParmTopic(false);" />

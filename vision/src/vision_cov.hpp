@@ -1,5 +1,4 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
 #include "vision/image_cv.h"
 #include "std_msgs/Int32MultiArray.h"
 #include <image_transport/image_transport.h>

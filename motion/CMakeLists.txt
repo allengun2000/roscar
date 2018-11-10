@@ -45,16 +45,12 @@ find_package(catkin REQUIRED COMPONENTS std_msgs roscpp message_generation)
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   Message1.msg
-#   Message2.msg
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(FILES
+  checknum.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -64,10 +60,9 @@ find_package(catkin REQUIRED COMPONENTS std_msgs roscpp message_generation)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(DEPENDENCIES
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -210,6 +205,15 @@ add_executable(test1
 )
 add_dependencies(test1 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(test1
+  ${catkin_LIBRARIES}
+  csslLib
+)
+
+add_executable(asdaA3
+  src/asdaA3.cpp
+)
+add_dependencies(asdaA3 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(asdaA3
   ${catkin_LIBRARIES}
   csslLib
 )
