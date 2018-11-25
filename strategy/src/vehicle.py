@@ -68,6 +68,7 @@ class CarEnv(object):
 
         v_goal=(self.goal_point-self.car_info['a'])
         self.obs_l[:],crash=self.obs_line()
+        print(self.obs_l)
         car_goal_vec=math.atan(v_goal[1]/v_goal[0])-self.car_info['yam'][0]
         s=np.hstack((v_goal/1000,self.obs_l/1000,self.car_info['yam'][1]*2,self.v/100,car_goal_vec)) #goal obsline wheelyam v car_goal_vec
         
@@ -163,7 +164,7 @@ class CarEnv(object):
     def obs_line(self,car_=None):
         obs_line=[]
         crash=0
-        for i in np.linspace(-math.pi/2, math.pi/2,O_LC,endpoint=False):
+        for i in np.linspace(-math.pi/2, math.pi/2,O_LC,endpoint=True):
             if car_ is None:
                 car_point=self.car_info['a'].copy()
                 car_=self.car_info['a'].copy()
@@ -181,13 +182,54 @@ class CarEnv(object):
             obs_line.append(j)
         
         return obs_line,crash
-            
+    def state_reward(self,state,action,rate):
+        r = 0.
+        # action = np.clip(action, *self.action_bound)
+        # s=self.state_old
+        # state
+
+        self.obs_l[:]=state[:]*rate/2
+################################
+        self.wheel_yam_a=action[0]
+        # print(action)
+#        print(self.wheel_yam_a)
+        self.wheel_yam=self.wheel_yam+self.wheel_yam_a*dt
+        self.wheel_yam = np.clip(self.wheel_yam, *self.wheel_yam_bound)
+        self.car_info['yam'][1]=self.wheel_yam
+        self.a=action[1]*30
+        self.v = self.v + self.a*dt
+        self.v = np.clip(self.v, *self.v_bound)
+        beta = math.atan((self.car_info['l'][1] / (self.car_info['l'][0] +self.car_info['l'][1])) * math.tan(self.wheel_yam))
+        self.car_info['main_vec'][0]=self.v * math.cos(self.car_info['yam'][0] + beta)
+        self.car_info['main_vec'][1]=self.v * math.sin(self.car_info['yam'][0] + beta)
+        self.car_info['yam'][0] += (self.v / self.car_info['l'][0]) * math.sin(beta)*dt
+        if self.car_info['yam'][0] > math.pi:
+            self.car_info['yam'][0]-=2*math.pi
+        elif self.car_info['yam'][0]<-math.pi:
+            self.car_info['yam'][0]+=2*math.pi
+#########################
+        # self.state_old=state
+        return
     def reset(self):
 #        self.o1_point[:]=np.random.rand(2)*(100,200)+(100,30)
         self.car_info['a']=(30,550)
         self.wheel_yam_a=0
         self.wheel_yam=math.radians(0)
         self.car_info['yam']=(math.radians(-20),0)
+        self.v = 1
+        self.a=0
+        self.max_x=0
+        v_goal=(self.goal_point-self.car_info['a'])
+        self.obs_l[:],_=self.obs_line()
+        car_goal_vec=math.atan(v_goal[1]/v_goal[0])-self.car_info['yam'][0]
+        s=np.hstack((v_goal/1000,self.obs_l/1000,self.car_info['yam'][1]*2,self.v/100,car_goal_vec)) #goal obsline wheelyam v car_goal_vec
+        
+        return s
+    def real_reset(self):
+#        self.o1_point[:]=np.random.rand(2)*(100,200)+(100,30)
+        self.car_info['a']=(300,600)
+        self.wheel_yam_a=0
+        self.car_info['yam']=(math.radians(90),0)
         self.v = 1
         self.a=0
         self.max_x=0
@@ -246,7 +288,7 @@ class Viewer(pyglet.window.Window):
             ('c3B', (249, 86, 86) * 4,))
         self.main_vec=self.batch.add(
             2, pyglet.gl.GL_LINES, foreground,
-            ('v2f', main_vec_v), ('c3B', (0, 0, 0) * 2))
+            ('v2f', main_vec_v), ('c3B', (0, 255, 0) * 2))
    # color
         car_dot=self.makeCircle(200,car_r,*self.car_point_)
         self.car = self.batch.add(
@@ -298,7 +340,7 @@ class Viewer(pyglet.window.Window):
     
     def linedot(self):
         line_dot_v=[]
-        for i, j in zip(np.linspace(-math.pi/2, math.pi/2 ,O_LC,endpoint=False),range(O_LC)):
+        for i, j in zip(np.linspace(-math.pi/2, math.pi/2 ,O_LC,endpoint=True),range(O_LC)):
             l_dot=self.car_point_.copy()
             line_dot_v.append(l_dot.copy())
             l_dot[0]+=self.obs_line[j]*math.cos(i+self.car_yam[0])

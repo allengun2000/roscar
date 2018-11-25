@@ -12,7 +12,7 @@ import rospy
 #import math
 from std_msgs.msg import Float32
 from std_msgs.msg import Int32
-#from std_msgs.msg import Int32MultiArray
+from std_msgs.msg import Float64MultiArray
 
 DISPLAY_REWARD_THRESHOLD=200
 env = CarEnv()
@@ -81,24 +81,23 @@ def train():
     print('Running time: ', time.time() - t1_)
     ddpg.save()
 
-"""
 def callback(data):
-     global state
-     line=np.array(data.data,dtype=np.float32)/1000
-     main_vec=rospy.get_param('/AvoidChallenge/GoodAngle')
-     num_change=main_vec*3-180;
-     go_where_x=math.cos(num_change*math.pi/180);
-     go_where_y=math.sin(num_change*math.pi/180);
-     print(main_vec)
-#     line=np.array(data.data)
-     #print(line[0:120:6])
-     state=[]
-     state[0:1]=np.array([go_where_x,go_where_y])
-     state[2:11]=line[60:120:6]
-     state[12:21]=line[0:60:6]
-     state=np.array(state)
-     print(state)
-"""
+     global line
+     line=np.array(data.data,dtype=np.float32)/2000 #road w in real is 80 and sim is 40
+#      main_vec=rospy.get_param('/AvoidChallenge/GoodAngle')
+#      num_change=main_vec*3-180
+#      go_where_x=math.cos(num_change*math.pi/180)
+#      go_where_y=math.sin(num_change*math.pi/180)
+#      print(main_vec)
+# #     line=np.array(data.data)
+#      #print(line[0:120:6])
+#      state=[]
+#      state[0:1]=np.array([go_where_x,go_where_y])
+#      state[2:11]=line[60:120:6]
+#      state[12:21]=line[0:60:6]
+#      state=np.array(state)
+    #  print(line)
+
 def ros_robot():
     pub = rospy.Publisher('/car_wheel', Float32, queue_size=10)
     pub1 = rospy.Publisher('/car_speed', Int32, queue_size=10)
@@ -107,17 +106,23 @@ def ros_robot():
     env.viewer.set_vsync(True)
     s = env.reset()
 
-    # rospy.Subscriber("/vision/BlackRealDis", Int32MultiArray, callback)
+    rospy.Subscriber("/roadDis", Float64MultiArray, callback)
     rospy.init_node('car_strage', anonymous=True)
     rate = rospy.Rate(30) # 10hz
     while not rospy.is_shutdown():
-        s=env.reset()/400
+        s=env.real_reset()/400
         ep_reward = 0
         for j in range(300):
             env.render()
-            a = ddpg.choose_action(s)
-            # s, r, done = env.step(a)
-            s, r, done,wheel_yam,v  = env.step(a)
+            # a = ddpg.choose_action(s)
+            # s, r, done = env.step(a)  goal obsline wheelyam v car_goal_vec
+            # s, r, done,wheel_yam,v  = env.step(a)
+            a=np.array([0.,0.])
+            env.state_reward(line,a,2000)
+            wheel_yam=0
+            v=10
+            r=1
+            done=0
             pub.publish(-wheel_yam*50/0.5235+100)
             pub1.publish(v*6/100+189)
             rate.sleep()
