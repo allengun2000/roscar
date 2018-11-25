@@ -51,6 +51,57 @@ break;
 return
 }
 /////////////////////////////////////////////////////////////////////////////////
+var wheelTopic = new ROSLIB.Topic({
+    ros : ros,
+    name : '/car_wheel',
+    messageType : 'std_msgs/Float32'
+});
+function pubwheel(a) {
+var wheel_msg = new ROSLIB.Message({
+   data:0.0
+});
+switch(a){
+case 0:
+wheel_msg.data=parseFloat(50);
+break;
+case 1:
+wheel_msg.data=parseFloat(80);
+break;
+case 2:
+wheel_msg.data=parseFloat(100);
+break;
+case 3:
+wheel_msg.data=parseFloat(120);
+break;
+case 4:
+wheel_msg.data=parseFloat(150);
+break;
+}
+  wheelTopic.publish(wheel_msg);
+return
+}
+///////
+var speedTopic = new ROSLIB.Topic({
+    ros : ros,
+    name : '/car_speed',
+    messageType : 'std_msgs/Int32'
+});
+function pubspeed(a) {
+var speed_msg = new ROSLIB.Message({
+   data:0
+});
+switch(a){
+case 0:
+speed_msg.data=Number(189);
+break;
+case 1:
+speed_msg.data=Number(193);
+break;
+}
+  speedTopic.publish(speed_msg);
+return
+}
+/////////////////////////////////////////////////////////////////////////////////
 var listener = new ROSLIB.Topic({
   ros : ros,
   name : '/MotorFB',

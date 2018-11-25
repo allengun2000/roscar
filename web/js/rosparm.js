@@ -116,6 +116,58 @@ hsv.get(function(value) {
 	    obj[9].value = value[3];
             obj[10].value = value[4];
 	    obj[11].value = value[5];
+		showValue(value[0],'Hmax')
+		showValue(value[1],'Hmin')
+		showValue(value[2],'Smax')
+		showValue(value[3],'Smin')
+		showValue(value[4],'Vmax')
+		showValue(value[5],'Vmin')
+    }
+});
+//=========================================================================
+var black_angle = new ROSLIB.Param({
+    ros: ros,
+    name: '/golf/black_angle'
+});
+function Paramblack_angleSet() {
+    obj = document.getElementsByName('ParameterElement');
+    black_angle.set(parseFloat(obj[12].value));
+}
+black_angle.get(function(value) {
+    if (value != null) {
+        obj = document.getElementsByName("ParameterElement");
+            obj[12].value = value;
+    }
+});
+var center_outer = new ROSLIB.Param({
+    ros: ros,
+    name: '/golf/center_outer'
+});
+function Paramcenter_outerSet() {
+    obj = document.getElementsByName('ParameterElement');
+    center_outer.set(parseFloat(obj[13].value));
+}
+center_outer.get(function(value) {
+    if (value != null) {
+        obj = document.getElementsByName("ParameterElement");
+            obj[13].value = value;
+	    showValue(value,'center_out')
+    }
+});
+//=========================================================================
+var hof = new ROSLIB.Param({
+    ros: ros,
+    name: '/golf/hof'
+});
+function ParamhofSet() {
+    obj = document.getElementsByName('ParameterElement1');
+    hof.set(parseFloat(obj[0].value));
+}
+hof.get(function(value) {
+    if (value != null) {
+        obj = document.getElementsByName("ParameterElement1");
+            obj[0].value = value;
+	   showValue(value,'hof')
     }
 });
 //=========================================================================
@@ -148,6 +200,9 @@ function RosSaveParam() {
     ParamKxSet();
     ParamKySet();
     ParamhsvSet();
+    Paramblack_angleSet();
+    Paramcenter_outerSet();
+    ParamhofSet();
     //ParamSpeedLimitSet();
 }
 

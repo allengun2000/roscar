@@ -132,9 +132,11 @@ int main(int argc, char *argv[])
                 // imshow("Roi_size",Roi_size);
             }
         }
+        Mat app;
         resize(frame_resize,frame_resize,cv::Size(img_w,img_h),CV_INTER_LINEAR);
-        frame_resize=worldcoordinate(frame_resize);
+        app=worldcoordinate(frame_resize);
         imshow("capture",frame_resize);
+        // imshow("capture1",app);
         frame_resize.release();
         //imwrite("capture.png",frame_resize);
         //imwrite("capture2.png",img_1);

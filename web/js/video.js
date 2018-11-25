@@ -136,5 +136,5 @@
      //var player = new MJPEG.Player("player", "http://192.168.43.146:8080/stream?topic=/usb_cam/image_raw&type=ros_compressed");
     //var player = new MJPEG.Player("player", "http://192.168.0.13:8080/stream?topic=/usb_cam/image_raw&type=ros_compressed");
     //var player = new MJPEG.Player("player", "http://192.168.0.13:8080/stream?topic=/camera/image");
-    var player = new MJPEG.Player("player", "http://" + document.getElementById("RobotIP").value + ":8080/stream?topic=/usb_cam/image_raw&type=ros_compressed");
+    var player = new MJPEG.Player("player", "http://" + document.getElementById("RobotIP").value + ":8080/stream?topic=/camera/image&type=ros_compressed");
     player.start();

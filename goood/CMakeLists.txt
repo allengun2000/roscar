@@ -205,3 +205,12 @@ add_dependencies(simple_ros ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTE
 target_link_libraries(simple_ros
   ${catkin_LIBRARIES}
 )
+
+
+add_executable(qq
+  src/q1.cpp
+)
+add_dependencies(qq ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(qq
+  ${catkin_LIBRARIES}
+)

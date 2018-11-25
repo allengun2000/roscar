@@ -5,9 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "geometry_msgs/Twist.h"
-#include "std_msgs/Int32.h"
-#include "std_msgs/Float32.h"
-#include "std_msgs/Int32MultiArray.h"
+#include "std_msgs/Float64.h"
 #include "motion/checknum.h"
 #include <stdio.h>
 #include "cssl/cssl.h"
@@ -19,9 +17,15 @@
 using namespace std;
 //====motor define=====
 
-std_msgs::Int32 rpm_info;
-std_msgs::Float32 PUU_info;
-std_msgs::Float32 A_info;
+std_msgs::Float64 rpm_info;
+std_msgs::Float64 PUU_info;
+std_msgs::Float64 A_info;
+std_msgs::Float64 rpm_info1;
+std_msgs::Float64 PUU_info1;
+std_msgs::Float64 A_info1;
+std_msgs::Float64 rpm_info2;
+std_msgs::Float64 PUU_info2;
+std_msgs::Float64 A_info2;
 int puu_control=0;
 cssl_t *serial;
 cssl_t *serial1;
@@ -55,38 +59,38 @@ fflush(stdout);
 static void mcssl_callback1(int id, uint8_t *buf, int length)
 {
 if(State1==1){
-rpm_info.data = buf[3] * 256 + buf[4];
-if (rpm_info.data > 32767){
-	rpm_info.data = -(65535 - rpm_info.data + 1);}
+rpm_info1.data = buf[3] * 256 + buf[4];
+if (rpm_info1.data > 32767){
+	rpm_info1.data = -(65535 - rpm_info1.data + 1);}
 }else if(State1==3){
-	PUU_info.data = buf[6]*256*256+buf[3] * 256 + buf[4];
-if (PUU_info.data > 8388608){
-	PUU_info.data = -(16777216 - PUU_info.data + 1);}
-PUU_info.data/=10000;
+	PUU_info1.data = buf[6]*256*256+buf[3] * 256 + buf[4];
+if (PUU_info1.data > 8388608){
+	PUU_info1.data = -(16777216 - PUU_info1.data + 1);}
+PUU_info1.data/=10000;
 }else if(State1==4){
-	A_info.data = buf[5]*256*256*256+buf[6] * 256 *256+ buf[3]*256 +buf[4];
-if (A_info.data > 2147483648){
-	A_info.data = -(4294967296 - A_info.data + 1);}
-A_info.data*=0.01;
+	A_info1.data = buf[5]*256*256*256+buf[6] * 256 *256+ buf[3]*256 +buf[4];
+if (A_info1.data > 2147483648){
+	A_info1.data = -(4294967296 - A_info1.data + 1);}
+A_info1.data*=0.01;
 }
 fflush(stdout);
 }
 static void mcssl_callback2(int id, uint8_t *buf, int length)
 {
 if(State2==1){
-rpm_info.data = buf[3] * 256 + buf[4];
-if (rpm_info.data > 32767){
-	rpm_info.data = -(65535 - rpm_info.data + 1);}
+rpm_info2.data = buf[3] * 256 + buf[4];
+if (rpm_info2.data > 32767){
+	rpm_info2.data = -(65535 - rpm_info2.data + 1);}
 }else if(State2==3){
-	PUU_info.data = buf[6]*256*256+buf[3] * 256 + buf[4];
-if (PUU_info.data > 8388608){
-	PUU_info.data = -(16777216 - PUU_info.data + 1);}
-PUU_info.data/=10000;
+	PUU_info2.data = buf[6]*256*256+buf[3] * 256 + buf[4];
+if (PUU_info2.data > 8388608){
+	PUU_info2.data = -(16777216 - PUU_info2.data + 1);}
+PUU_info2.data/=10000;
 }else if(State2==4){
-	A_info.data = buf[5]*256*256*256+buf[6] * 256 *256+ buf[3]*256 +buf[4];
-if (A_info.data > 2147483648){
-	A_info.data = -(4294967296 - A_info.data + 1);}
-A_info.data*=0.01;
+	A_info2.data = buf[5]*256*256*256+buf[6] * 256 *256+ buf[3]*256 +buf[4];
+if (A_info2.data > 2147483648){
+	A_info2.data = -(4294967296 - A_info2.data + 1);}
+A_info2.data*=0.01;
 }
 fflush(stdout);
 }
@@ -391,16 +395,15 @@ void Afeedback(){
     State2=4;
 	mdelay(20);
 }
-void MotorSpeedcall(const std_msgs::Int32MultiArray::ConstPtr& array)
+void MotorSpeedcall(const geometry_msgs::Twist::ConstPtr& msg)
 {
-	// for(int i=0;i<sizeof(msg->data)/4;i++){
-	// 	cout<<msg->data[i]<<",,"<<i<<endl;
-	// }
-	int i=0;
-	 for(std::vector<int>::const_iterator it = array->data.begin() ; it != array->data.end(); ++it)
-    {   
-		mcssl_send2motor(i,*it);
-    }
+	
+	mcssl_send2motor(0,int(msg->linear.x));
+	mcssl_send2motor(1,int(msg->linear.y));
+	mcssl_send2motor(2,int(msg->linear.z));
+	mcssl_send2motor(3,int(msg->angular.x));
+	mcssl_send2motor(4,int(msg->angular.y));
+	mcssl_send2motor(5,int(msg->angular.z));
 	mdelay(20);
 
 }
@@ -413,14 +416,37 @@ int main(int argc, char *argv[])
 
 	ros::ServiceServer service = n.advertiseService("check_num", checkserver);
 	ros::Subscriber motion_sub3 = n.subscribe("/Motorcmd", 10, MotorSpeedcall);
-	ros::Rate loop_rate(10);
+	ros::Publisher A_pub = n.advertise<geometry_msgs::Twist>("/MotorA", 1000);
+	ros::Publisher puu_pub= n.advertise<geometry_msgs::Twist>("/MotorFB", 1000);
+	ros::Publisher speed_pub = n.advertise<geometry_msgs::Twist>("/speedFB", 1000);
+	geometry_msgs::Twist motora_msg;
+	geometry_msgs::Twist motorpuu_msg;
+	geometry_msgs::Twist motorspeed_msg;
 
 	int count = 0;
+	 do{if(mcssl_init() > 0){
+        break;
+        }else{
+          usleep(1000000);//1s = 1,000,000 us
+        }}while(ros::ok());
+    ROS_INFO("Motion is running\n");
+    ros::Rate loop_rate(30);
 	while (ros::ok())
 	{
-		
-		ros::spinOnce();
 
+		Afeedback();
+		Puufeedback();
+		motora_msg.linear.x=A_info.data;
+		motora_msg.linear.y=A_info1.data;
+		motora_msg.linear.z=A_info2.data;
+		motorpuu_msg.linear.x=PUU_info.data;
+		motorpuu_msg.linear.y=PUU_info1.data;
+		motorpuu_msg.linear.z=PUU_info2.data;
+		A_pub.publish(motora_msg);
+		puu_pub.publish(motorpuu_msg);
+
+
+		ros::spinOnce();
 		loop_rate.sleep();
 
 	}

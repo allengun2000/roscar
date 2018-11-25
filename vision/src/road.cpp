@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 #include "vision/image_cv.h"
-#include "std_msgs/Int32MultiArray.h"
+#include "std_msgs/Float64MultiArray.h"
 #include "std_msgs/Bool.h"
 #include <image_transport/image_transport.h>
 #include <opencv2/opencv.hpp>
@@ -21,26 +21,53 @@ float heigh = 13.5;
 float angle = 2.5;
 int Kx = 1650;
 int Ky = 1650;
+int black_angle=10;
+int center_outer=400;
+int hof=150;
+int y_start=99999;
+int y_end=0;
 std::vector<double> HSV;
 std::vector<double> blackItem_pixel;
+void drawLines(Mat &input);
+
+
 cv::Mat worldcoordinate(cv::Mat img){
 int xsize = img.cols;
 int ysize = img.rows;
+Mat ipm_img = Mat::zeros(cv::Size(world_x, world_y), CV_8UC3);
+	y_start=99999;
 
-	Mat ipm_img = Mat::zeros(cv::Size(world_x, world_y), CV_8UC3);
-	
 	for (uint16_t i = 0; i < world_y; i++) {
 		uchar* ipm_data = ipm_img.ptr<uchar>(i);
 		for (uint16_t j = 0; j < world_x; j++) {
 			float xx = xsize / 2 + Kx * (j - (world_x / 2)) / ((world_y - i)*cos(angle*M_PI / 180) + heigh * sin(angle * M_PI / 180));
 			float yy = ysize / 2 - Ky * ((world_y - i)*sin(angle * M_PI / 180) - heigh * cos(angle * M_PI / 180)) / ((world_y - i)*cos(angle * M_PI / 180) - heigh * sin(angle * M_PI / 180));
 			if (xx > 0 && xx < xsize && yy>0 && yy < ysize) {
-				ipm_data[j * 3 + 0] = img.at<Vec3b>(yy, xx)[0];
-				ipm_data[j * 3 + 1] = img.at<Vec3b>(yy, xx)[1];
-				ipm_data[j * 3 + 2] = img.at<Vec3b>(yy, xx)[2];
+				
+				if(img.at<Vec3b>(yy, xx)[0]==255 && img.at<Vec3b>(yy, xx)[1]==0 && img.at<Vec3b>(yy, xx)[2]==0){
+				ipm_data[j * 3 + 0] = 255;
+				ipm_data[j * 3 + 1] = 255;
+				ipm_data[j * 3 + 2] = 255;}
+				else{
+				// ipm_data[j * 3 + 0] = 0;
+				// ipm_data[j * 3 + 1] = 0;
+				// ipm_data[j * 3 + 2] = 0;
+				// ipm_data[j * 3 + 0] = img.at<Vec3b>(yy, xx)[0];
+				// ipm_data[j * 3 + 1] = img.at<Vec3b>(yy, xx)[1];
+				// ipm_data[j * 3 + 2] = img.at<Vec3b>(yy, xx)[2];
+				}
+			}else{
+				if (yy > ysize && i<y_start){
+				 y_start=i;
+				}
 			}
 		}
 	}
+Mat cat_roi(ipm_img,cv::Rect(0,y_start-131,world_x-1,world_y-y_start+131));
+drawLines(cat_roi); //將畫面直線延伸
+
+Mat imgroi = ipm_img(cv::Rect(0,y_start-131,world_x-1,world_y-y_start));
+cat_roi.copyTo(imgroi,cat_roi);
 
 	return ipm_img;
 }
@@ -53,17 +80,10 @@ int Frame_area(int num,int range){
 }
 
 cv::Mat dis_dot(cv::Mat img){
-int y_start=0;
-for(int y=0;y<=img.rows;y++){
-if(!img.at<Vec3b>(y, img.cols/2)[0]){
-	break;
-}
-y_start=y;
-}
-int black_angle=10;
-int center_outer=100;
+
+
 blackItem_pixel.clear();
-         for(int angle = 0; angle < 180; angle = angle + black_angle){
+         for(int angle = 0; angle < 181; angle = angle + black_angle){
               int angle_be = angle;
 
               if(angle_be >= 360) angle_be -= 360;
@@ -78,8 +98,8 @@ blackItem_pixel.clear();
                   int image_y = Frame_area(y_start-dis_y,img.rows);
 
                   if( img.data[(image_y*img.cols + image_x)*3+0] == 255
-                    &&img.data[(image_y*img.cols + image_x)*3+1] == 0
-                    &&img.data[(image_y*img.cols + image_x)*3+2] == 0){
+                    &&img.data[(image_y*img.cols + image_x)*3+1] == 255
+                    &&img.data[(image_y*img.cols + image_x)*3+2] == 255){
                       blackItem_pixel.push_back(hypot(dis_x,dis_y));
                       break;
                   }else{
@@ -105,6 +125,9 @@ void ParmIsChangeCallback(const std_msgs::Bool::ConstPtr& msg)
 	n.getParam("/golf/world_x",world_x);
 	n.getParam("/golf/world_y",world_y);
 	n.getParam("/golf/hsv",HSV);
+	n.getParam("/golf/black_angle",black_angle);
+	n.getParam("/golf/center_outer",center_outer);
+	n.getParam("/golf/hof",hof);
 	// cout<<"read parm"<<endl;
 }else{
 		system("rosparam dump ~/linux/catkin_ws/src/a_launch/config/Parameter.yaml /golf");
@@ -121,6 +144,9 @@ if(file){
 	n.getParam("/golf/world_x",world_x);
 	n.getParam("/golf/world_y",world_y);
 	n.getParam("/golf/hsv",HSV);
+	n.getParam("/golf/black_angle",black_angle);
+	n.getParam("/golf/center_outer",center_outer);
+	n.getParam("/golf/hof",hof);
     cout<<"read the YAML file"<<endl;
   }else{
 	n.setParam("/golf/high",13.5);
@@ -147,23 +173,61 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
     return;
   }
 }
-void calcLinesP(const Mat &input, std::vector<Vec4i> &lines) {
-	Mat contours;
-	// Canny(input, contours, 100, 150);
-	// cv::imshow("canny", contours);
-	lines.clear();
+
+void drawLinesP(Mat &input,Mat &deaw_pic) {
+	std::vector<Vec4i> lines;
 	HoughLinesP(input, lines, 1, CV_PI / 180, 50, 10, 70);
+	for (int i = 0; i<lines.size(); i++) {
+		line(deaw_pic, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(255, 0, 0), 3);
+	}
+	lines.clear();
+}
+void drawLines(Mat &input){ 
+    std::vector<Vec2f> lines;
+    Mat roi;
+    // Canny(input,roi,50,200);
+	cvtColor(input, roi, COLOR_BGR2GRAY);
+		// cv::imshow("woqrsd",input);
+   	    // cv::waitKey(1);
+	std::vector<Vec4i> liness;
+	std::vector<Point> linedott;
+	Point xy_line_temp;
+	HoughLinesP(roi, liness, 1, CV_PI / 180, hof, 10, 70);
+	for (int i = 0; i<liness.size(); i++) {
+		// line(input, Point(liness[i][0], liness[i][1]), Point(liness[i][2], liness[i][3]), Scalar(255, 0, 0), 3);
+		
+		int m=(liness[i][2]-liness[i][0] != 0)?(liness[i][3]-liness[i][1])/(liness[i][2]-liness[i][0]):99999;
+		int b=-liness[i][2]*m+liness[i][3];
+		
+		for (int j=0;j<input.cols*3;j++){
+			int x=j/3;
+			int y=m*x+b;
+			if (m==0)continue;
+			if(y<input.rows-1 && y>0){
+				xy_line_temp.x=x;
+				xy_line_temp.y=y;
+				linedott.push_back(xy_line_temp);
+			}
+		}
+		if(linedott.size()==0)continue;
+		
+		line(input, Point(linedott[0].x, linedott[0].y), Point(linedott[linedott.size()-1].x, linedott[linedott.size()-1].y), Scalar(255, 255, 255), 3);
+					// input.at<Vec3b>(y,x)[0]=255;//blue 通道
+					// input.at<Vec3b>(y,x)[1]=255;//green 通道
+					// input.at<Vec3b>(y,x)[2]=255;//red 通道
+		linedott.clear();
+		// cv::imshow("worsd",input);
+		//  cv::waitKey(1);
+	}
+	liness.clear();
+	
+		
 }
 
-void drawLinesP(Mat &input, const std::vector<Vec4i> &lines) {
-	for (int i = 0; i<lines.size(); i++) {
-		line(input, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(255, 0, 0), 3);
-	}
-}
 int main(int argc, char *argv[])
 {
 	
-	ros::init(argc, argv, "image_listen");
+	ros::init(argc, argv, "road");
 
 
 	ros::NodeHandle n;
@@ -174,8 +238,9 @@ int main(int argc, char *argv[])
     ros::Subscriber sub_parm = n.subscribe("/ParmIsChange", 10, ParmIsChangeCallback);
   image_transport::ImageTransport it(n);
   image_transport::Subscriber sub_image = it.subscribe("usb_cam/image_raw", 1, imageCallback,ros::VoidPtr(),image_transport::TransportHints("compressed"));
-  std_msgs::Int32MultiArray disLine;
-  ros::Publisher dis_pub = n.advertise<std_msgs::Int32MultiArray>("/roadDis", 1);
+//   image_transport::Publisher pub_image = it.advertise("camera/image", 1);
+  std_msgs::Float64MultiArray disLine;
+  ros::Publisher dis_pub = n.advertise<std_msgs::Float64MultiArray>("/roadDis", 1);
   sensor_msgs::ImagePtr msg_image;
 	int count = 0;
 while (ros::ok())
@@ -196,29 +261,31 @@ while (ros::ok())
     inRange(hsv, Scalar(HSV[1], HSV[3], HSV[5]), Scalar(HSV[0], HSV[2], HSV[4]), mask);
 
 
-		calcLinesP(mask, linesP);
-		drawLinesP(img, linesP);
+		drawLinesP(mask,img);
 		
-		Mat world(img,cv::Rect(0,160,640,195));
-	    world=worldcoordinate(world);
+		
+		Mat world;
+		
+	    world=worldcoordinate(img);
+		// cv::imshow("line", world);
 		Mat worldtodot;
 		worldtodot= dis_dot(world);
-		// cvtColor(Main_frame,gray_image,CV_BGR2GRAY);
 
 
 
 		cv::imshow("Images", Main_frame);
-		cv::imshow("img", img);
-		cv::imshow("line", mask);
-		cv::imshow("word",world);
+		cv::imshow("img", worldtodot);
+		// cv::imshow("line", mask);
+		// cv::imshow("word",world);
    	    cv::waitKey(1);
 		
 		////////////dis pub
 		disLine.data.clear();
-		disLine.data.push_back(1);
-		disLine.data.push_back(2);
+		disLine.data=blackItem_pixel;
 		dis_pub.publish(disLine);
 
+		// msg_image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img).toImageMsg();
+		// pub_image.publish(msg_image);
 
 		loop_rate.sleep();
 	}

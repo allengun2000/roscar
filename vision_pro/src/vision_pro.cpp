@@ -10,6 +10,11 @@ void chatterCallback(const vision::image_cv::ConstPtr& msg)
 				 		for(int k=0;k<3;k++){
 		Main_frame.data[(i*Main_frame.cols*3)+(j*3)+k]=msg->data[(i*Main_frame.cols*3)+(j*3)+k];
 				 }
+	// int i=0;
+	//  for(std::vector<int>::const_iterator it = array->data.begin() ; it != array->data.end(); ++it)
+    // {   
+	// 	mcssl_send2motor(i,*it);
+    // }
 	}
 }
 

@@ -45,7 +45,7 @@ while (ros::ok())
 		
 		}
 		cvtColor(Main_frame,gray_image,CV_BGR2GRAY);
-    msg_image = cv_bridge::CvImage(std_msgs::Header(), "mono8", gray_image).toImageMsg();
+    msg_image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", gray_image).toImageMsg();
 		pub_image.publish(msg_image);
 		pic_source.weight=Main_frame.cols;//x
 		pic_source.hight=Main_frame.rows;//y

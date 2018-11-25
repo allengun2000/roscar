@@ -1,7 +1,10 @@
 Kx: 646.9232
 Ky: 688.61158
-angle: 9
+angle: 20
+black_angle: 20
+center_outer: 284
 high: 60
+hof: 40
 hsv: [189, 147, 251, 87, 254, 187]
 world_x: 500
 world_y: 800

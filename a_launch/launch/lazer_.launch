@@ -1,0 +1,4 @@
+<launch> 
+ <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch" />
+<node name="rosrun" pkg="rviz" type="rviz" args="-f velodyne"/>
+</launch> 

@@ -100,6 +100,11 @@
 				<!--label id="height_l">0</label>
 				<input type="range" min="0" max="20" name="ParameterElement" value="2.5" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'height_l');" -->
                             </td>
+			    <td>hof</td>
+                            <td>
+				<label id="hof">150</label>
+				<input type="range" min="0" max="255" name="ParameterElement1" value="150" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'hof');">
+                            </td>
                         </tr>
 			<tr>
                             <td>angle</td>
@@ -177,6 +182,19 @@
 				<input type="range" min="0" max="255" name="ParameterElement" value="0" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'Vmin');">
                             </td>
                         </tr>
+			<tr>
+                            <td>angle_line</td>
+                            <td>
+                                <input type="text" name="ParameterElement" value="3" >
+                            </td>
+                        
+			<tr>
+                            <td>center_out</td>
+                            <td>
+                                <label id="center_out">40</label>
+				<input type="range" min="40" max="1000" name="ParameterElement" value="40" oninput="RosSaveParam();pubParmTopic(true);showValue(this.value,'center_out');">
+                            </td>
+                        </tr>
                         <tr>
                             <td colspan="2">
                                 <input type="Button" value="Sent" onclick="RosSaveParam();pubParmTopic(true);" />
@@ -184,6 +202,7 @@
                             </td>
                         </tr> 
                     </table>
+
      </div> 
 	<div class="box">
 	<label name="MotorFb">MotorFb:</label>
