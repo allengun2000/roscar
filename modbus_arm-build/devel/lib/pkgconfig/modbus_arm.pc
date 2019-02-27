@@ -1,8 +1,0 @@
-prefix=/home/allen/linux/catkin_ws/src/modbus_arm-build/devel
-
-Name: modbus_arm
-Description: Description of modbus_arm
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/allen/linux/catkin_ws/src/modbus_arm-build/devel/lib 
-Requires: 

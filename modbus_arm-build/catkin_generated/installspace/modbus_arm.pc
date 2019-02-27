@@ -1,8 +1,0 @@
-prefix=/usr/local
-
-Name: modbus_arm
-Description: Description of modbus_arm
-Version: 0.0.0
-Cflags: 
-Libs: -L/usr/local/lib 
-Requires: 
