@@ -38,6 +38,11 @@ using namespace cv::gpu;
 cv::Mat Main_frame;
 cv::Mat img_1;
 cv::Mat img_;
+
+cv::Mat frame_black_widow;
+cv::Mat img;
+cv::Mat frame_resize_gray;
+
 cv::Mat frame;
 cv::Mat frame_resize;
 cv::Mat learning_img;

@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "vision/image_cv.h"
 #include "std_msgs/Float64MultiArray.h"
+#include "std_msgs/Float32.h"
 #include "std_msgs/Bool.h"
 #include <image_transport/image_transport.h>
 #include <opencv2/opencv.hpp>
@@ -26,6 +27,7 @@ int center_outer=400;
 int hof=150;
 int y_start=99999;
 int y_end=0;
+int car_vec=0;
 std::vector<double> HSV;
 std::vector<double> blackItem_pixel;
 void drawLines(Mat &input);
@@ -112,6 +114,9 @@ blackItem_pixel.clear();
                   }
               }
           }
+		//   cout<<(CV_PI/2+(car_vec-100)*0.02*(CV_PI/6))*180/CV_PI<<endl;
+		  line(img,Point(img.cols/2,y_start),Point(img.cols/2-50*cos(CV_PI/2+(car_vec-100)*0.02*(CV_PI/6)),y_start-50*sin(CV_PI/2)+(car_vec-100)*0.02*(CV_PI/6)),Scalar(255,0,0),5);
+		  
 	return img;
 }
 void ParmIsChangeCallback(const std_msgs::Bool::ConstPtr& msg)
@@ -173,7 +178,10 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
     return;
   }
 }
+void carwheel_vec(const std_msgs::Float32::ConstPtr& msg){
+car_vec=msg->data;
 
+}
 void drawLinesP(Mat &input,Mat &deaw_pic) {
 	std::vector<Vec4i> lines;
 	HoughLinesP(input, lines, 1, CV_PI / 180, 50, 10, 70);
@@ -236,6 +244,7 @@ int main(int argc, char *argv[])
 	ros::Rate loop_rate(100);
     Parameter_getting(1);
     ros::Subscriber sub_parm = n.subscribe("/ParmIsChange", 10, ParmIsChangeCallback);
+	ros::Subscriber sub_car_wheel = n.subscribe("/car_wheel", 10, carwheel_vec);
   image_transport::ImageTransport it(n);
   image_transport::Subscriber sub_image = it.subscribe("usb_cam/image_raw", 1, imageCallback,ros::VoidPtr(),image_transport::TransportHints("compressed"));
 //   image_transport::Publisher pub_image = it.advertise("camera/image", 1);
@@ -260,7 +269,7 @@ while (ros::ok())
     	    Mat1b mask, mask2;
     inRange(hsv, Scalar(HSV[1], HSV[3], HSV[5]), Scalar(HSV[0], HSV[2], HSV[4]), mask);
 
-
+cv::imshow("Images", mask);
 		drawLinesP(mask,img);
 		
 		
@@ -272,8 +281,7 @@ while (ros::ok())
 		worldtodot= dis_dot(world);
 
 
-
-		cv::imshow("Images", Main_frame);
+		
 		cv::imshow("img", worldtodot);
 		// cv::imshow("line", mask);
 		// cv::imshow("word",world);

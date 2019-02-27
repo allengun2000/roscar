@@ -68,7 +68,7 @@ class CarEnv(object):
 
         v_goal=(self.goal_point-self.car_info['a'])
         self.obs_l[:],crash=self.obs_line()
-        print(self.obs_l)
+        # print(self.obs_l)
         car_goal_vec=math.atan(v_goal[1]/v_goal[0])-self.car_info['yam'][0]
         s=np.hstack((v_goal/1000,self.obs_l/1000,self.car_info['yam'][1]*2,self.v/100,car_goal_vec)) #goal obsline wheelyam v car_goal_vec
         
@@ -225,9 +225,94 @@ class CarEnv(object):
         s=np.hstack((v_goal/1000,self.obs_l/1000,self.car_info['yam'][1]*2,self.v/100,car_goal_vec)) #goal obsline wheelyam v car_goal_vec
         
         return s
+    def reset_easy(self):
+#        self.o1_point[:]=np.random.rand(2)*(100,200)+(100,30)
+        self.car_info['a']=(30,550)
+        self.wheel_yam_a=0
+        self.wheel_yam=math.radians(0)
+        self.car_info['yam']=(math.radians(-20),0)
+        self.v = 1
+        self.a=0
+        self.max_x=0
+        self.obs_l[:],_=self.obs_line()
+        s=np.hstack((self.obs_l/1000,self.car_info['yam'][1]/self.wheel_yam_bound[1],self.v/100)) #obsline wheelyam v
+        return s
+    
+    def step_easy(self, action):
+        done = False
+        r = 0.
+
+#        print(self.wheel_yam_a)
+        self.wheel_yam=action[0]*self.wheel_yam_bound[1]
+        self.wheel_yam = np.clip(self.wheel_yam, *self.wheel_yam_bound)
+        self.car_info['yam'][1]=self.wheel_yam
+        self.v = action[1]*100
+        self.v = np.clip(self.v, *self.v_bound)
+        beta = math.atan((self.car_info['l'][1] / (self.car_info['l'][0] +self.car_info['l'][1])) * math.tan(self.wheel_yam))
+        self.car_info['main_vec'][0]=self.v * math.cos(self.car_info['yam'][0] + beta)
+        self.car_info['main_vec'][1]=self.v * math.sin(self.car_info['yam'][0] + beta)
+        self.car_info['a'][0]+=  self.v * math.cos(self.car_info['yam'][0] + beta)*dt
+        self.car_info['a'][1]+=  self.v * math.sin(self.car_info['yam'][0] + beta)*dt
+        self.car_info['yam'][0] += (self.v / self.car_info['l'][0]) * math.sin(beta)*dt
+        if self.car_info['yam'][0] > math.pi:
+            self.car_info['yam'][0]-=2*math.pi
+        elif self.car_info['yam'][0]<-math.pi:
+            self.car_info['yam'][0]+=2*math.pi
+        self.car_info['a']=np.clip(self.car_info['a'],*self.point_bound)
+        # state
+
+        self.obs_l[:],crash=self.obs_line()
+        s=np.hstack((self.obs_l/1000,self.car_info['yam'][1]/self.wheel_yam_bound[1],self.v/100)) #obsline wheelyam v
+        # done and reward
+##conut go on road
+        if self.max_x<self.car_info['a'][0] and crash==0:
+            self.max_x=self.car_info['a'][0]
+            r=abs(self.v/20)
+##road middle
+        if self.car_info['a'][0]<500:
+           y=math.cos(self.car_info['a'][0]/100)*150+400
+        if self.car_info['a'][0]>500:
+           y=self.car_info['a'][0]/5+ 343
+        r-=abs(self.car_info['a'][1]-y)/5000 
+#goal_dis
+        goal_car_dis=np.hypot(*(self.car_info['a']-self.goal_point)) 
+        r-=goal_car_dis/40000
+#        print([abs(self.car_info['a'][1]-y)/5000,self.v/20,goal_car_dis/40000,np.sum(np.absolute(action))/100])
+        if goal_car_dis<25+car_r:
+#            done = True
+            r += 10.
+        if crash==1:
+#            done = True
+            r += -1.
+#            print('crash')
+        if self.car_info['a'][0]==30 or self.car_info['a'][0]>1000 :
+#                done = True
+                r += -1.
+#        print(r)
+        return s, r, done
+#        return s, r, done ,self.wheel_yam,self.v
+    def state_reward_easy(self,state,action,rate):
+        r = 0.
+        self.obs_l[:]=state[:-2]*rate/2
+        self.wheel_yam=action[0]*self.wheel_yam_bound[1]
+        self.wheel_yam = np.clip(self.wheel_yam, *self.wheel_yam_bound)
+        self.car_info['yam'][1]=self.wheel_yam
+        self.v = action[1]*100
+        self.v = np.clip(self.v, *self.v_bound)
+        
+        beta = math.atan((self.car_info['l'][1] / (self.car_info['l'][0] +self.car_info['l'][1])) * math.tan(self.wheel_yam))
+        self.car_info['main_vec'][0]=self.v * math.cos(self.car_info['yam'][0]+beta)
+        self.car_info['main_vec'][1]=self.v * math.sin(self.car_info['yam'][0]+beta)
+        self.car_info['yam'][0] =math.radians(90)
+        if self.car_info['yam'][0] > math.pi:
+            self.car_info['yam'][0]-=2*math.pi
+        elif self.car_info['yam'][0]<-math.pi:
+            self.car_info['yam'][0]+=2*math.pi
+#########################
+        return self.wheel_yam ,self.v
     def real_reset(self):
 #        self.o1_point[:]=np.random.rand(2)*(100,200)+(100,30)
-        self.car_info['a']=(300,600)
+        self.car_info['a']=(300,500)
         self.wheel_yam_a=0
         self.car_info['yam']=(math.radians(90),0)
         self.v = 1
@@ -235,10 +320,7 @@ class CarEnv(object):
         self.max_x=0
         v_goal=(self.goal_point-self.car_info['a'])
         self.obs_l[:],_=self.obs_line()
-        car_goal_vec=math.atan(v_goal[1]/v_goal[0])-self.car_info['yam'][0]
-        s=np.hstack((v_goal/1000,self.obs_l/1000,self.car_info['yam'][1]*2,self.v/100,car_goal_vec)) #goal obsline wheelyam v car_goal_vec
-        
-        return s
+        return
     
     def render(self):
         if self.viewer is None:
@@ -288,7 +370,7 @@ class Viewer(pyglet.window.Window):
             ('c3B', (249, 86, 86) * 4,))
         self.main_vec=self.batch.add(
             2, pyglet.gl.GL_LINES, foreground,
-            ('v2f', main_vec_v), ('c3B', (0, 255, 0) * 2))
+            ('v2f', main_vec_v), ('c3B', (255, 0, 0) * 2))
    # color
         car_dot=self.makeCircle(200,car_r,*self.car_point_)
         self.car = self.batch.add(

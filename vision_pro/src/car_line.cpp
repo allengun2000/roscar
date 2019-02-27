@@ -72,6 +72,11 @@ int main(int argc, char *argv[])
 
 
         resize(frame,frame_resize,cv::Size(512,288),CV_INTER_LINEAR);
+
+
+cvtColor(frame_resize,frame_resize_gray,CV_BGR2GRAY);//w
+
+
         count1++;
 
         if (predict_hy) {
@@ -136,7 +141,7 @@ int main(int argc, char *argv[])
         resize(frame_resize,frame_resize,cv::Size(img_w,img_h),CV_INTER_LINEAR);
         app=worldcoordinate(frame_resize);
         imshow("capture",frame_resize);
-        // imshow("capture1",app);
+        imshow("capture1",app);
         frame_resize.release();
         //imwrite("capture.png",frame_resize);
         //imwrite("capture2.png",img_1);
@@ -990,7 +995,10 @@ void Condensationtracking() {
 
     //Lineim=Mat::zeros(frame_resize.rows,frame_resize.cols,frame_resize.type());
     //img_1=Mat::zeros(frame_resize.rows,frame_resize.cols,frame_resize.type());
-    if (vh > 0) {
+    
+    Mat black(img_H,img_W, CV_8UC3, Scalar(0, 0, 0));
+
+  if (vh > 0) {
         for (int k = img_H-1; k > drawheight /*vh + 10*/; k--) {
             float upil = uh + al * (k - vh) + b / (k - vh);
             float upir = uh + ar * (k - vh) + b / (k - vh);
@@ -999,6 +1007,7 @@ void Condensationtracking() {
         }
         if (!hyperbolas_l.empty()) {
             drawline(hyperbolas_l, &frame_resize, Scalar(0, 100, 255));
+            drawline(hyperbolas_l, &black, Scalar(0, 0, 255));
             //drawline(hyperbolas_l, &binary_img, Scalar(0, 100, 255));
             //drawline(hyperbolas_l, &Lineim, Scalar(0, 100, 255));
             //drawline(hyperbolas_l, &img_1, Scalar(0, 100, 255));
@@ -1006,7 +1015,7 @@ void Condensationtracking() {
 
         if (!hyperbolas_r.empty()) {
             drawline(hyperbolas_r, &frame_resize, Scalar(101, 0, 255));
-            //drawline(hyperbolas_r, &binary_img, Scalar(101, 0, 255));
+            drawline(hyperbolas_r, &black, Scalar(0, 255, 0));
             //drawline(hyperbolas_r, &Lineim, Scalar(101, 0, 255));
             //drawline(hyperbolas_r, &img_1, Scalar(0, 100, 255));
         }
@@ -1016,6 +1025,53 @@ void Condensationtracking() {
     }else{
         predict_hy = false;
     }
+
+    frame_black_widow = black;
+    cvtColor(frame_black_widow,img,CV_BGR2GRAY);
+    GaussianBlur(frame_resize_gray,frame_resize_gray,Size(5,5),0,0);
+    Mat dst1,dst2;
+    Canny(frame_resize_gray,dst1,50,150,3);
+    threshold(dst1,dst2,128,255,THRESH_BINARY_INV);
+
+
+    int val,thr;
+    int line1=0;
+    int line2=0;
+    int car=0;
+    for(int height=0;height<img.rows;height++){
+
+        for(int width=0;width<img.cols;width++){
+            val=img.at<uchar>(height,width);
+            thr=dst1.at<uchar>(height,width);
+            //printf("%d  ",val);
+            if(val==76){
+                line1=width;
+            }
+            if(val==150){
+                line2=width;
+            }
+            if(width>line1+10&&width<line2-10){
+                if(thr==255){
+                    car=height;
+                }
+            }
+        }
+        for(int width=line1;width<line2;width++){
+            if(width>line1&&width<line2){
+                if(height>car&&height<img.rows){
+                img.at<uchar>(height,width)=80;
+//                frame_black_widow.at<Vec3b>(height,width)[0]=216;
+//                frame_black_widow.at<Vec3b>(height,width)[1]=191;
+//                frame_black_widow.at<Vec3b>(height,width)[2]=216;
+                frame_resize.at<Vec3b>(height,width)[0]=255;
+                frame_resize.at<Vec3b>(height,width)[1]=226;
+                frame_resize.at<Vec3b>(height,width)[2]=198;
+                }
+            }
+        }
+    }
+    imshow("canny_img", dst1);
+
 
     hyperbolas_r.clear();
     hyperbolas_l.clear();

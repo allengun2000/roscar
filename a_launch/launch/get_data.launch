@@ -1,0 +1,9 @@
+<launch> 
+ <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch" />
+<node name="rosrun" pkg="rviz" type="rviz" args="-f velodyne"/>
+<node name="usb_cam" pkg="usb_cam" type="usb_cam_node"/>
+<!--<node name="gps1" pkg="nmea_navsat_driver" type="nmea_serial_driver"/>-->
+<node name="gps2" pkg="nmea_navsat_driver" type="nmea_topic_serial_reader"/>
+
+ 
+</launch>

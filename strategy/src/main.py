@@ -16,7 +16,8 @@ from std_msgs.msg import Float64MultiArray
 
 DISPLAY_REWARD_THRESHOLD=200
 env = CarEnv()
-s_dim = 5+env.O_LC
+#s_dim = 5+env.O_LC
+s_dim = 2+env.O_LC
 a_dim = 2
 a_bound =env.action_bound
 ddpg = DDPG(a_dim, s_dim, a_bound)
@@ -82,55 +83,46 @@ def train():
     ddpg.save()
 
 def callback(data):
-     global line
-     line=np.array(data.data,dtype=np.float32)/2000 #road w in real is 80 and sim is 40
-#      main_vec=rospy.get_param('/AvoidChallenge/GoodAngle')
+     global state
+     line=np.array((data.data),dtype=np.float32) #road w in real is 80 and sim is 40
+     
+#      main_vec=rospy.get_param('/AvoidChallenge/GoodAngle') s=np.hstack((self.obs_l/1000,self.car_info['yam'][1]/self.wheel_yam_bound[1],self.v/100))
 #      num_change=main_vec*3-180
 #      go_where_x=math.cos(num_change*math.pi/180)
 #      go_where_y=math.sin(num_change*math.pi/180)
 #      print(main_vec)
 # #     line=np.array(data.data)
 #      #print(line[0:120:6])
-#      state=[]
-#      state[0:1]=np.array([go_where_x,go_where_y])
-#      state[2:11]=line[60:120:6]
-#      state[12:21]=line[0:60:6]
-#      state=np.array(state)
-    #  print(line)
+     state=[]
+     state[0:9]=line/1000
+     state.append(a[0])
+     state.append(a[1])
+     state=np.array(state)
+     
+    #  print(state)
 
 def ros_robot():
+    global a
+    a=np.zeros(2)
     pub = rospy.Publisher('/car_wheel', Float32, queue_size=10)
     pub1 = rospy.Publisher('/car_speed', Int32, queue_size=10)
     ddpg.restore()
     env.render()
     env.viewer.set_vsync(True)
-    s = env.reset()
-
+    env.reset_easy()
     rospy.Subscriber("/roadDis", Float64MultiArray, callback)
     rospy.init_node('car_strage', anonymous=True)
     rate = rospy.Rate(30) # 10hz
+    env.real_reset()
     while not rospy.is_shutdown():
-        s=env.real_reset()/400
-        ep_reward = 0
-        for j in range(300):
             env.render()
-            # a = ddpg.choose_action(s)
-            # s, r, done = env.step(a)  goal obsline wheelyam v car_goal_vec
-            # s, r, done,wheel_yam,v  = env.step(a)
-            a=np.array([0.,0.])
-            env.state_reward(line,a,2000)
-            wheel_yam=0
-            v=10
-            r=1
+            a = ddpg.choose_action(state)
+            wheel_yam,v=env.state_reward_easy(state,a,2000)
             done=0
             pub.publish(-wheel_yam*50/0.5235+100)
-            pub1.publish(v*6/100+189)
+            pub1.publish(int(v*6/100+189))
             rate.sleep()
-#            print(-wheel_yam*50/0.5235+100,v*6/100+189)
-            ep_reward += r
-            if j == 299 or done==True :
-                    print(' Reward: %i' % int(ep_reward) )
-                    break
+
         
         
 
@@ -143,13 +135,13 @@ def eval_():
     env.viewer.set_vsync(True)
     s = env.reset()
     while True:
-        s=env.reset()/400
+        s=env.reset_easy()
         ep_reward = 0
         for j in range(300):
             env.render()
             a = ddpg.choose_action(s)
-            # s, r, done = env.step(a)
-            s, r, done,wheel_yam,v  = env.step(a)
+            s, r, done = env.step_easy(a)
+            # s, r, done,wheel_yam,v  = env.step_easy(a)
 #            print(-wheel_yam*50/0.5235+100,v*6/100+189)
             ep_reward += r
             
@@ -161,3 +153,4 @@ if ON_TRAIN:
     train()
 else:
     ros_robot()
+    # eval_()

@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
   // cv::namedWindow("Images");
 	// cv::startWindowThread();
   image_transport::ImageTransport it(n);
-  // image_transport::Subscriber sub_image = it.subscribe("usb_cam/image_raw", 1, imageCallback);
-	image_transport::Subscriber sub_image = it.subscribe("usb_cam/image_raw", 1, imageCallback,ros::VoidPtr(),image_transport::TransportHints("compressed"));
+  image_transport::Subscriber sub_image = it.subscribe("usb_cam/image_raw", 1, imageCallback);
+	// image_transport::Subscriber sub_image = it.subscribe("/camera2/usb_cam2/image_raw", 1, imageCallback,ros::VoidPtr(),image_transport::TransportHints("compressed"));
   image_transport::Publisher pub_image = it.advertise("camera/image", 1);
 	ros::Publisher pic_pub = n.advertise<vision::image_cv>("pic_source", 1);
   sensor_msgs::ImagePtr msg_image;
@@ -45,7 +45,7 @@ while (ros::ok())
 		
 		}
 		cvtColor(Main_frame,gray_image,CV_BGR2GRAY);
-    msg_image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", gray_image).toImageMsg();
+    msg_image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", Main_frame).toImageMsg();
 		pub_image.publish(msg_image);
 		pic_source.weight=Main_frame.cols;//x
 		pic_source.hight=Main_frame.rows;//y
