@@ -1,0 +1,8 @@
+prefix=/home/allen/linux/catkin_ws/src/interface-build/devel
+
+Name: interface
+Description: Description of interface
+Version: 0.0.0
+Cflags: -I/home/allen/linux/catkin_ws/src/interface-build/devel/include
+Libs: -L/home/allen/linux/catkin_ws/src/interface-build/devel/lib 
+Requires: message_runtime

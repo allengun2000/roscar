@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/allen/linux/catkin_ws/src/interface-build/devel/setup.sh

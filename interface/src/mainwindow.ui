@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1409</width>
+    <height>868</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QLabel" name="speed_n">
+    <property name="geometry">
+     <rect>
+      <x>970</x>
+      <y>640</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="lineWidth">
+     <number>2</number>
+    </property>
+    <property name="text">
+     <string>speed</string>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="wordWrap">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="start">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>470</y>
+      <width>99</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>start</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="key_board">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>420</y>
+      <width>97</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>key board</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="picture">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>371</width>
+      <height>271</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>image</string>
+    </property>
+   </widget>
+   <widget class="QwtDial" name="oil">
+    <property name="geometry">
+     <rect>
+      <x>910</x>
+      <y>10</y>
+      <width>201</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="lowerBound">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="upperBound">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="scaleMaxMajor">
+     <number>10</number>
+    </property>
+    <property name="scaleMaxMinor">
+     <number>5</number>
+    </property>
+    <property name="totalSteps">
+     <UInt>100</UInt>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+   </widget>
+   <widget class="QCustomPlot" name="way_info" native="true">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>10</y>
+      <width>361</width>
+      <height>271</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="joystick">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>450</y>
+      <width>250</width>
+      <height>250</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>joystick</string>
+    </property>
+   </widget>
+   <widget class="QwtDial" name="speed">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>530</y>
+      <width>201</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="upperBound">
+     <double>40.000000000000000</double>
+    </property>
+    <property name="scaleMaxMajor">
+     <number>10</number>
+    </property>
+    <property name="scaleMaxMinor">
+     <number>5</number>
+    </property>
+    <property name="totalSteps">
+     <UInt>100</UInt>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+   </widget>
+   <widget class="QwtDial" name="wheel">
+    <property name="geometry">
+     <rect>
+      <x>900</x>
+      <y>270</y>
+      <width>221</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="lowerBound">
+     <double>-90.000000000000000</double>
+    </property>
+    <property name="upperBound">
+     <double>90.000000000000000</double>
+    </property>
+    <property name="scaleMaxMajor">
+     <number>10</number>
+    </property>
+    <property name="scaleMaxMinor">
+     <number>5</number>
+    </property>
+    <property name="totalSteps">
+     <UInt>100</UInt>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="oil_n">
+    <property name="geometry">
+     <rect>
+      <x>980</x>
+      <y>120</y>
+      <width>21</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="lineWidth">
+     <number>2</number>
+    </property>
+    <property name="text">
+     <string>oil</string>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="wordWrap">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="oil_num">
+    <property name="geometry">
+     <rect>
+      <x>1020</x>
+      <y>120</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>num</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="wheel_n">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>380</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="lineWidth">
+     <number>2</number>
+    </property>
+    <property name="text">
+     <string>wheel</string>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="wordWrap">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="wheel_num">
+    <property name="geometry">
+     <rect>
+      <x>1020</x>
+      <y>380</y>
+      <width>31</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>num</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="speed_num">
+    <property name="geometry">
+     <rect>
+      <x>1030</x>
+      <y>640</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="lineWidth">
+     <number>2</number>
+    </property>
+    <property name="text">
+     <string>num</string>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="wordWrap">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <zorder>start</zorder>
+   <zorder>key_board</zorder>
+   <zorder>picture</zorder>
+   <zorder>oil</zorder>
+   <zorder>way_info</zorder>
+   <zorder>joystick</zorder>
+   <zorder>speed</zorder>
+   <zorder>wheel</zorder>
+   <zorder>oil_n</zorder>
+   <zorder>oil_num</zorder>
+   <zorder>wheel_n</zorder>
+   <zorder>wheel_num</zorder>
+   <zorder>speed_n</zorder>
+   <zorder>speed_num</zorder>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1409</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QwtDial</class>
+   <extends>QWidget</extends>
+   <header>qwt_dial.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
