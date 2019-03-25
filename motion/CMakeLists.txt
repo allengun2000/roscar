@@ -193,7 +193,8 @@ include_directories(
 
 
 
-add_library(csslLib src/cssl/cssl.h src/cssl/cssl.c src/cssl/uty.c)
+add_library(csslLib
+  src/golf_motor.cpp src/cssl/cssl.h src/cssl/cssl.c src/cssl/uty.c)
 
 add_executable(motion src/motion.cpp src/MotorControl.h)
 add_dependencies(motion ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -214,6 +215,15 @@ add_executable(asdaA3
 )
 add_dependencies(asdaA3 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(asdaA3
+  ${catkin_LIBRARIES}
+  csslLib
+)
+
+add_executable(golf_car
+  src/golf_motor.cpp
+)
+add_dependencies(golf_car ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(golf_car
   ${catkin_LIBRARIES}
   csslLib
 )

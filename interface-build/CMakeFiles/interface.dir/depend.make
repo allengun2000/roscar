@@ -692,6 +692,7 @@ CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/senso
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/sensor_msgs/Image.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/sensor_msgs/RegionOfInterest.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/sensor_msgs/image_encodings.h
+CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/std_msgs/Float32.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/std_msgs/Header.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/std_msgs/String.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h
@@ -1385,6 +1386,7 @@ CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/sensor_msgs/Co
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/sensor_msgs/Image.h
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/sensor_msgs/RegionOfInterest.h
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/sensor_msgs/image_encodings.h
+CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/std_msgs/Float32.h
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/std_msgs/Header.h
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/std_msgs/String.h
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h
@@ -2079,6 +2081,7 @@ CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/sensor_m
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/sensor_msgs/Image.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/sensor_msgs/RegionOfInterest.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/sensor_msgs/image_encodings.h
+CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/std_msgs/Float32.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/std_msgs/Header.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/std_msgs/String.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h

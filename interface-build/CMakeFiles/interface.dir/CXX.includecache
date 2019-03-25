@@ -157,6 +157,8 @@ qwt/qwt_dial_needle.h
 -
 geometry_msgs/Quaternion.h
 /home/allen/linux/catkin_ws/src/interface/src/geometry_msgs/Quaternion.h
+std_msgs/Float32.h
+/home/allen/linux/catkin_ws/src/interface/src/std_msgs/Float32.h
 
 /opt/ros/kinetic/include/cv_bridge/cv_bridge.h
 sensor_msgs/Image.h
@@ -2314,6 +2316,22 @@ cstdlib
 stdexcept
 -
 string
+-
+
+/opt/ros/kinetic/include/std_msgs/Float32.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
 -
 
 /opt/ros/kinetic/include/std_msgs/Header.h

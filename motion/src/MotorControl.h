@@ -34,7 +34,7 @@ if (rpm_info.data > 32767){
 	PUU_info.data = buf[6]*256*256+buf[3] * 256 + buf[4];
 if (PUU_info.data > 8388608){
 	PUU_info.data = -(16777216 - PUU_info.data + 1);}
-PUU_info.data/=10000;
+PUU_info.data/=1000;
 }else if(State==4){
 	A_info.data = buf[5]*256*256*256+buf[6] * 256 *256+ buf[3]*256 +buf[4];
 if (A_info.data > 2147483648){
@@ -107,10 +107,8 @@ unsigned int crc_chk(unsigned char* data, unsigned char length)
 		   }
 		   return reg_crc;
 	   }
-
-void mcssl_send2motor(int rpm_value)
-{
-unsigned char send_data[13] = { 0,0,0,0,0,0,0,0,0,0,0,0,0 };
+void mcssl_send2motor(int rpm_value){
+	unsigned char send_data[13] = { 0,0,0,0,0,0,0,0,0,0,0,0,0 };
 		int return_value, l_crc, h_crc;
 unsigned char rpm_send_data[4] = { 0,0,0,0 };
 
@@ -126,8 +124,8 @@ unsigned char rpm_send_data[4] = { 0,0,0,0 };
 
 	send_data[0] = 0x01;
 	send_data[1] = 0x10;
-	send_data[2] = 0x01;
-	send_data[3] = 0x12;
+	send_data[2] = 0x06;
+	send_data[3] = 0x06;
 
 	send_data[4] = 0x00;
 	send_data[5] = 0x02;
@@ -157,7 +155,103 @@ unsigned char rpm_send_data[4] = { 0,0,0,0 };
 	cssl_putchar(serial,send_data[12]);
     State=2;
 	mdelay(20);
+}
+void puu_send2motor(int puu_value)
+{
+unsigned char send_data[13] = { 0,0,0,0,0,0,0,0,0,0,0,0,0 };
+		int return_value, l_crc, h_crc;
+unsigned char puu_send_data[4] = { 0,0,0,0 };
 
+	puu_send_data[1] = puu_value % 256;
+	puu_value >>= 8;
+	puu_send_data[0] = puu_value % 256;
+	puu_value >>= 8;
+	puu_send_data[3] = puu_value % 256;
+	puu_value >>= 8;
+	puu_send_data[2] = puu_value % 256;
+	puu_value >>= 8;
+
+
+	send_data[0] = 0x01;
+	send_data[1] = 0x10;
+	send_data[2] = 0x06;
+	send_data[3] = 0x06;
+
+	send_data[4] = 0x00;
+	send_data[5] = 0x02;
+	send_data[6] = 0x04;
+
+	memcpy(&send_data[7], puu_send_data, 4);
+
+	return_value = crc_chk(send_data, 11);
+	l_crc = return_value % 256;
+	h_crc = return_value / 256;
+
+	send_data[11] = l_crc;
+	send_data[12] = h_crc;
+
+    cssl_putchar(serial,send_data[0]);
+	cssl_putchar(serial,send_data[1]);
+	cssl_putchar(serial,send_data[2]);
+	cssl_putchar(serial,send_data[3]);
+	cssl_putchar(serial,send_data[4]);
+	cssl_putchar(serial,send_data[5]);
+	cssl_putchar(serial,send_data[6]);
+	cssl_putchar(serial,send_data[7]);
+	cssl_putchar(serial,send_data[8]);
+	cssl_putchar(serial,send_data[9]);
+	cssl_putchar(serial,send_data[10]);
+	cssl_putchar(serial,send_data[11]);
+	cssl_putchar(serial,send_data[12]);
+    State=2;
+	mdelay(20);
+//puu
+	int puu_state = 1;
+	send_data[13];
+	puu_send_data[1] = puu_state % 256;
+	puu_state >>= 8;
+	puu_send_data[0] = puu_state % 256;
+	puu_state >>= 8;
+	////低位元
+	puu_send_data[3] = puu_state % 256;
+	puu_state >>= 8;
+	puu_send_data[2] = puu_state % 256;
+	puu_state >>= 8;
+	//高位元
+
+	send_data[0] = 0x01;//motor 機台號碼
+	send_data[1] = 0x10;//命令碼10 寫入多組字組
+	send_data[2] = 0x05;//傳送地址a 01
+	send_data[3] = 0x0e;//傳送地址b 12
+
+						//兩個字元
+	send_data[4] = 0x00;//00
+	send_data[5] = 0x02;//02
+	send_data[6] = 0x04;//4 byte 04
+
+	memcpy(&send_data[7], puu_send_data, 4);//rpm 放入命令中
+
+											//crc 碼生成 函式起動
+    return_value = crc_chk(send_data, 11);
+	l_crc = return_value % 256;
+    h_crc = return_value / 256;
+	//crc 放入 send_data
+	send_data[11] = l_crc;
+	send_data[12] = h_crc;
+    cssl_putchar(serial,send_data[0]);
+	cssl_putchar(serial,send_data[1]);
+	cssl_putchar(serial,send_data[2]);
+	cssl_putchar(serial,send_data[3]);
+	cssl_putchar(serial,send_data[4]);
+	cssl_putchar(serial,send_data[5]);
+	cssl_putchar(serial,send_data[6]);
+	cssl_putchar(serial,send_data[7]);
+	cssl_putchar(serial,send_data[8]);
+	cssl_putchar(serial,send_data[9]);
+	cssl_putchar(serial,send_data[10]);
+	cssl_putchar(serial,send_data[11]);
+	cssl_putchar(serial,send_data[12]);
+	mdelay(20);
 }
 
 void motionfeedback(){

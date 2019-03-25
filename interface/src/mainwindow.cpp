@@ -14,6 +14,7 @@ MainWindow::MainWindow(int argc, char** argv ,QWidget *parent) :
 
     sub = n->subscribe("/test",10 ,&MainWindow::callback ,this);
     sub1 = n->subscribe("/cmd",10 ,&MainWindow::callback1 ,this);
+    sub2= n->subscribe("/wheelFB",10,&MainWindow::callback2,this);
     it = new image_transport::ImageTransport(*n);
     sub_image = it->subscribe("/usb_cam/image_raw", 1, &MainWindow::imageCallback,this);
     pub_cmd  = n->advertise<geometry_msgs::Quaternion>("/cmd",0);
@@ -32,6 +33,14 @@ MainWindow::MainWindow(int argc, char** argv ,QWidget *parent) :
     ui->wheel->setNeedle(dial_needle_1);
     ui->wheel->show();
     ui->wheel_num->setText(QString("%1").arg(0));
+
+    ui->wheel_2->setMode(QwtDial::RotateNeedle);
+    ui->wheel_2->setValue(0);
+    dial_needle_1 = new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Arrow, true, Qt::gray, Qt::darkGray);
+    ui->wheel_2->setNeedle(dial_needle_1);
+    ui->wheel_2->show();
+    ui->wheel_num_2->setText(QString("%1").arg(0));
+
 
 
     ui->way_info->addGraph();
@@ -104,6 +113,13 @@ void MainWindow::callback1(const geometry_msgs::Quaternion::ConstPtr& msg){
     ui->wheel->setValue(msg->w);
     ui->wheel->show();
 }
+void MainWindow::callback2(const std_msgs::Float32::ConstPtr& msg){
+    ui->wheel_num_2->setText(QString("%1").arg(msg->data));
+    ui->wheel_2->setValue(msg->data);
+    ui->wheel_2->show();
+
+}
+
 void MainWindow::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
   cv_bridge::CvImagePtr cv_ptr;
