@@ -428,6 +428,7 @@ int main(int argc, char *argv[])
         break;
         }else{
           usleep(1000000);//1s = 1,000,000 us
+		  
         }}while(ros::ok());
     ROS_INFO("Motion is running\n");
     ros::Rate loop_rate(30);

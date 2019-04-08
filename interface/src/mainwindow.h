@@ -18,7 +18,8 @@
 #include "qcustomplot.h"
 #include<qwt/qwt_dial.h>
 #include<qwt/qwt_dial_needle.h>
-#include "geometry_msgs/Quaternion.h"
+#include "geometry_msgs/Pose2D.h"
+
 #include "std_msgs/Float32.h"
 using namespace std;
 using namespace cv;
@@ -40,8 +41,9 @@ ros::NodeHandle *n;
     ros::Subscriber sub;
     ros::Subscriber sub1;
     ros::Subscriber sub2;
+    ros::Subscriber sub3;
     ros::Publisher pub_cmd;
-    geometry_msgs::Quaternion cmd_msg;
+    geometry_msgs::Pose2D cmd_msg;
     cv::Mat  Main_frame;
     cv::Mat  result_frame;
     image_transport::ImageTransport *it;
@@ -49,9 +51,11 @@ ros::NodeHandle *n;
     QVector<double> X_polt;
     QVector<double> Y_polt;
 
-    QwtDialSimpleNeedle *dial_needle_1;
+
     QwtDialSimpleNeedle *dial_needle_;
-    QwtDialSimpleNeedle *dial_needle_2;
+//    QwtDialSimpleNeedle *dial_needle_1;
+//    QwtDialSimpleNeedle *dial_needle_2;
+//    QwtDialSimpleNeedle *dial_needle_3;
     bool joy_touch=0;
     void keyPressEvent(QKeyEvent * event);
     void mousePressEvent(QMouseEvent *event);
@@ -61,8 +65,9 @@ private slots:
     void on_start_clicked();
     void ShowData();
     void callback(const std_msgs::String::ConstPtr& msg);
-    void callback1(const geometry_msgs::Quaternion::ConstPtr& msg);
-     void callback2(const std_msgs::Float32::ConstPtr& msg);
+    void callback1(const geometry_msgs::Pose2D::ConstPtr& msg);
+    void callback2(const std_msgs::Float32::ConstPtr& msg);
+    void callback3(const std_msgs::Float32::ConstPtr& msg);
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     QPixmap cvMatToQPixmap( const cv::Mat &inMat);
     QImage cvMatToQImage( const cv::Mat &inMat );

@@ -488,7 +488,7 @@ CMakeFiles/interface.dir/interface_automoc.cpp.o: moc_qcustomplot.cpp
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /home/allen/linux/catkin_ws/src/interface/include/interface/qcustomplot.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /home/allen/linux/catkin_ws/src/interface/src/mainwindow.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/cv_bridge/cv_bridge.h
-CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Quaternion.h
+CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Pose2D.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/image_transport/camera_publisher.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/image_transport/camera_subscriber.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o: /opt/ros/kinetic/include/image_transport/exception.h
@@ -1182,7 +1182,7 @@ CMakeFiles/interface.dir/src/main.cpp.o: /home/allen/linux/catkin_ws/src/interfa
 CMakeFiles/interface.dir/src/main.cpp.o: /home/allen/linux/catkin_ws/src/interface/src/main.cpp
 CMakeFiles/interface.dir/src/main.cpp.o: /home/allen/linux/catkin_ws/src/interface/src/mainwindow.h
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/cv_bridge/cv_bridge.h
-CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Quaternion.h
+CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Pose2D.h
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/image_transport/camera_publisher.h
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/image_transport/camera_subscriber.h
 CMakeFiles/interface.dir/src/main.cpp.o: /opt/ros/kinetic/include/image_transport/exception.h
@@ -1877,7 +1877,7 @@ CMakeFiles/interface.dir/src/mainwindow.cpp.o: /home/allen/linux/catkin_ws/src/i
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /home/allen/linux/catkin_ws/src/interface/src/mainwindow.cpp
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /home/allen/linux/catkin_ws/src/interface/src/mainwindow.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/cv_bridge/cv_bridge.h
-CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Quaternion.h
+CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Pose2D.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/image_transport/camera_publisher.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/image_transport/camera_subscriber.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o: /opt/ros/kinetic/include/image_transport/exception.h

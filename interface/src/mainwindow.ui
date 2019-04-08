@@ -142,7 +142,7 @@
      </rect>
     </property>
     <property name="upperBound">
-     <double>40.000000000000000</double>
+     <double>99.000000000000000</double>
     </property>
     <property name="scaleMaxMajor">
      <number>10</number>
@@ -169,11 +169,17 @@
       <height>201</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>6</pointsize>
+      <italic>true</italic>
+     </font>
+    </property>
     <property name="lowerBound">
-     <double>-90.000000000000000</double>
+     <double>-721.000000000000000</double>
     </property>
     <property name="upperBound">
-     <double>90.000000000000000</double>
+     <double>721.000000000000000</double>
     </property>
     <property name="scaleMaxMajor">
      <number>10</number>
@@ -288,15 +294,21 @@
      <rect>
       <x>1170</x>
       <y>260</y>
-      <width>231</width>
-      <height>201</height>
+      <width>241</width>
+      <height>211</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>6</pointsize>
+      <italic>true</italic>
+     </font>
+    </property>
     <property name="lowerBound">
-     <double>-90.000000000000000</double>
+     <double>-721.000000000000000</double>
     </property>
     <property name="upperBound">
-     <double>90.000000000000000</double>
+     <double>721.000000000000000</double>
     </property>
     <property name="scaleMaxMajor">
      <number>10</number>
@@ -317,9 +329,9 @@
    <widget class="QLabel" name="wheel_n_2">
     <property name="geometry">
      <rect>
-      <x>1240</x>
+      <x>1230</x>
       <y>370</y>
-      <width>41</width>
+      <width>81</width>
       <height>41</height>
      </rect>
     </property>
@@ -327,7 +339,7 @@
      <number>2</number>
     </property>
     <property name="text">
-     <string>wheel</string>
+     <string>wheel echo</string>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -339,9 +351,9 @@
    <widget class="QLabel" name="wheel_num_2">
     <property name="geometry">
      <rect>
-      <x>1300</x>
+      <x>1310</x>
       <y>370</y>
-      <width>31</width>
+      <width>41</width>
       <height>41</height>
      </rect>
     </property>

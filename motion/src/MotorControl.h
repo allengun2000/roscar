@@ -206,51 +206,51 @@ unsigned char puu_send_data[4] = { 0,0,0,0 };
     State=2;
 	mdelay(20);
 //puu
-	int puu_state = 1;
-	send_data[13];
-	puu_send_data[1] = puu_state % 256;
-	puu_state >>= 8;
-	puu_send_data[0] = puu_state % 256;
-	puu_state >>= 8;
-	////低位元
-	puu_send_data[3] = puu_state % 256;
-	puu_state >>= 8;
-	puu_send_data[2] = puu_state % 256;
-	puu_state >>= 8;
-	//高位元
+	// int puu_state = 1;
+	// send_data[13];
+	// puu_send_data[1] = puu_state % 256;
+	// puu_state >>= 8;
+	// puu_send_data[0] = puu_state % 256;
+	// puu_state >>= 8;
+	// ////低位元
+	// puu_send_data[3] = puu_state % 256;
+	// puu_state >>= 8;
+	// puu_send_data[2] = puu_state % 256;
+	// puu_state >>= 8;
+	// //高位元
 
-	send_data[0] = 0x01;//motor 機台號碼
-	send_data[1] = 0x10;//命令碼10 寫入多組字組
-	send_data[2] = 0x05;//傳送地址a 01
-	send_data[3] = 0x0e;//傳送地址b 12
+	// send_data[0] = 0x01;//motor 機台號碼
+	// send_data[1] = 0x10;//命令碼10 寫入多組字組
+	// send_data[2] = 0x05;//傳送地址a 01
+	// send_data[3] = 0x0e;//傳送地址b 12
 
-						//兩個字元
-	send_data[4] = 0x00;//00
-	send_data[5] = 0x02;//02
-	send_data[6] = 0x04;//4 byte 04
+	// 					//兩個字元
+	// send_data[4] = 0x00;//00
+	// send_data[5] = 0x02;//02
+	// send_data[6] = 0x04;//4 byte 04
 
-	memcpy(&send_data[7], puu_send_data, 4);//rpm 放入命令中
+	// memcpy(&send_data[7], puu_send_data, 4);//rpm 放入命令中
 
-											//crc 碼生成 函式起動
-    return_value = crc_chk(send_data, 11);
-	l_crc = return_value % 256;
-    h_crc = return_value / 256;
-	//crc 放入 send_data
-	send_data[11] = l_crc;
-	send_data[12] = h_crc;
-    cssl_putchar(serial,send_data[0]);
-	cssl_putchar(serial,send_data[1]);
-	cssl_putchar(serial,send_data[2]);
-	cssl_putchar(serial,send_data[3]);
-	cssl_putchar(serial,send_data[4]);
-	cssl_putchar(serial,send_data[5]);
-	cssl_putchar(serial,send_data[6]);
-	cssl_putchar(serial,send_data[7]);
-	cssl_putchar(serial,send_data[8]);
-	cssl_putchar(serial,send_data[9]);
-	cssl_putchar(serial,send_data[10]);
-	cssl_putchar(serial,send_data[11]);
-	cssl_putchar(serial,send_data[12]);
+	// 										//crc 碼生成 函式起動
+    // return_value = crc_chk(send_data, 11);
+	// l_crc = return_value % 256;
+    // h_crc = return_value / 256;
+	// //crc 放入 send_data
+	// send_data[11] = l_crc;
+	// send_data[12] = h_crc;
+    cssl_putchar(serial,0x01);
+	cssl_putchar(serial,0x10);
+	cssl_putchar(serial,0x05);
+	cssl_putchar(serial,0x0e);
+	cssl_putchar(serial,0x00);
+	cssl_putchar(serial,0x02);
+	cssl_putchar(serial,0x04);
+	cssl_putchar(serial,0x00);
+	cssl_putchar(serial,0x00);
+	cssl_putchar(serial,0x00);
+	cssl_putchar(serial,0x01);
+	cssl_putchar(serial,0x8c); //0x8c
+	cssl_putchar(serial,0xb3); //0xb3
 	mdelay(20);
 }
 

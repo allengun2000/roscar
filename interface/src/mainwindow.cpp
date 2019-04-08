@@ -14,10 +14,11 @@ MainWindow::MainWindow(int argc, char** argv ,QWidget *parent) :
 
     sub = n->subscribe("/test",10 ,&MainWindow::callback ,this);
     sub1 = n->subscribe("/cmd",10 ,&MainWindow::callback1 ,this);
-    sub2= n->subscribe("/wheelFB",10,&MainWindow::callback2,this);
+    sub2= n->subscribe("/wheelangle",10,&MainWindow::callback2,this);
+    sub3= n->subscribe("/speed_encoder",10,&MainWindow::callback3,this);
     it = new image_transport::ImageTransport(*n);
     sub_image = it->subscribe("/usb_cam/image_raw", 1, &MainWindow::imageCallback,this);
-    pub_cmd  = n->advertise<geometry_msgs::Quaternion>("/cmd",0);
+    pub_cmd  = n->advertise<geometry_msgs::Pose2D>("/cmd",0);
 
 
     ui->oil->setMode(QwtDial::RotateNeedle);
@@ -29,18 +30,24 @@ MainWindow::MainWindow(int argc, char** argv ,QWidget *parent) :
 
     ui->wheel->setMode(QwtDial::RotateNeedle);
     ui->wheel->setValue(0);
-    dial_needle_1 = new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Arrow, true, Qt::gray, Qt::darkGray);
-    ui->wheel->setNeedle(dial_needle_1);
+//    dial_needle_1 = new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Arrow, true, Qt::gray, Qt::darkGray);
+    ui->wheel->setNeedle(dial_needle_);
     ui->wheel->show();
     ui->wheel_num->setText(QString("%1").arg(0));
 
     ui->wheel_2->setMode(QwtDial::RotateNeedle);
     ui->wheel_2->setValue(0);
-    dial_needle_1 = new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Arrow, true, Qt::gray, Qt::darkGray);
-    ui->wheel_2->setNeedle(dial_needle_1);
+//    dial_needle_2 = new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Arrow, true, Qt::gray, Qt::darkGray);
+    ui->wheel_2->setNeedle(dial_needle_);
     ui->wheel_2->show();
     ui->wheel_num_2->setText(QString("%1").arg(0));
 
+    ui->speed->setMode(QwtDial::RotateNeedle);
+    ui->speed->setValue(0);
+//    dial_needle_ = new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Arrow, true, Qt::gray, Qt::darkGray);
+    ui->speed->setNeedle(dial_needle_);
+    ui->speed->show();
+    ui->speed_num->setText(QString("%1").arg(0));
 
 
     ui->way_info->addGraph();
@@ -105,21 +112,24 @@ void MainWindow::callback(const std_msgs::String::ConstPtr& msg)
 
 
 }
-void MainWindow::callback1(const geometry_msgs::Quaternion::ConstPtr& msg){
-    ui->oil_num->setText(QString("%1").arg(msg->z));
-    ui->oil->setValue(msg->z);
+void MainWindow::callback1(const geometry_msgs::Pose2D::ConstPtr& msg){
+    ui->oil_num->setText(QString("%1").arg(msg->x));
+    ui->oil->setValue(msg->x);
     ui->oil->show();
-    ui->wheel_num->setText(QString("%1").arg(msg->w));
-    ui->wheel->setValue(msg->w);
+    ui->wheel_num->setText(QString("%1").arg(msg->theta));
+    ui->wheel->setValue(msg->theta);
     ui->wheel->show();
 }
 void MainWindow::callback2(const std_msgs::Float32::ConstPtr& msg){
     ui->wheel_num_2->setText(QString("%1").arg(msg->data));
     ui->wheel_2->setValue(msg->data);
     ui->wheel_2->show();
-
 }
-
+void MainWindow::callback3(const std_msgs::Float32::ConstPtr& msg){
+    ui->speed_num->setText(QString("%1").arg(msg->data));
+    ui->speed->setValue(msg->data);
+    ui->speed->show();
+}
 void MainWindow::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
   cv_bridge::CvImagePtr cv_ptr;
@@ -206,16 +216,15 @@ void MainWindow::mousePressEvent(QMouseEvent * event)
     double z=sqrt(x_m*x_m + y_m*y_m)/25;
     double h=(x_m==0)?9999999999999999:y_m/x_m;
     double w=atan(h)*180/CV_PI;
-    w=(x_m<0)?-abs(w):abs(w);
-    w=(w>0)?90-w:-(w+90);
+    w=(w>=0)?90-w:-(w+90);
+    w=w*8;
+    w=(x_m<=0)?-abs(w):abs(w);
     z=(y_m<0)?-abs(z):abs(z);
     if(abs(x_m)<125 && abs(y_m)<125 && z<5){
 //    qDebug() << "press" <<x_m  << ":" <<y_m<<"::"<<z<<"::"<<w;
     joy_touch=1;
-    cmd_msg.x=x_m;
-    cmd_msg.y=y_m;
-    cmd_msg.z=z;
-    cmd_msg.w=w;
+    cmd_msg.x=z;
+    cmd_msg.theta=w;
     pub_cmd.publish(cmd_msg);
     }
 }
@@ -228,15 +237,14 @@ void MainWindow::mouseMoveEvent(QMouseEvent * e)
      double z=sqrt(x_m*x_m + y_m*y_m)/25;
      double h=(x_m==0)?9999999999999999:y_m/x_m;
      double w=atan(h)*180/CV_PI;
-     w=(x_m<0)?-abs(w):abs(w);
-     w=(w>0)?90-w:-(w+90);
+     w=(w>=0)?90-w:-(w+90);
+     w=w*8;
+     w=(x_m<=0)?-abs(w):abs(w);
      z=(y_m<0)?-abs(z):abs(z);
     if(abs(x_m)<125 && abs(y_m)<125 && joy_touch==1 && z<5){
 //        qDebug() << "move" <<x_m  << ":" <<y_m<<"::"<<z<<"::"<<w;
-        cmd_msg.x=x_m;
-        cmd_msg.y=y_m;
-        cmd_msg.z=z;
-        cmd_msg.w=w;
+        cmd_msg.x=z;
+        cmd_msg.theta=w;
         pub_cmd.publish(cmd_msg);
     }
 }
@@ -246,10 +254,8 @@ void MainWindow::mouseReleaseEvent(QMouseEvent * e)
     QPoint windowPoint =e->globalPos() - this->pos();
     if(joy_touch==1){
 //    qDebug() << "Release" << windowPoint.x() << ":" << windowPoint.y();
-    cmd_msg.x=0;
-    cmd_msg.y=0;
-    cmd_msg.z=0;
-    cmd_msg.w=0;
+        cmd_msg.x=0;
+        cmd_msg.theta=0;
     pub_cmd.publish(cmd_msg);
     }
     joy_touch=0;
@@ -262,33 +268,25 @@ switch (event->key())
 {
 case Qt::Key_W:
 //qDebug() <<"GO";
-cmd_msg.x=0;
-cmd_msg.y=62;
-cmd_msg.z=2;
-cmd_msg.w=0;
+    cmd_msg.x=-1;
+    cmd_msg.theta=0;
 pub_cmd.publish(cmd_msg);
 break;
 case Qt::Key_S:
-    cmd_msg.x=0;
-    cmd_msg.y=0;
-    cmd_msg.z=0;
-    cmd_msg.w=0;
+    cmd_msg.x=62;
+    cmd_msg.theta=20;
     pub_cmd.publish(cmd_msg);
 //qDebug() <<"S";
 break;
 case Qt::Key_D:
     cmd_msg.x=62;
-    cmd_msg.y=62;
-    cmd_msg.z=2;
-    cmd_msg.w=45;
+    cmd_msg.theta=20;
     pub_cmd.publish(cmd_msg);
 //qDebug() <<"D";
 break;
 case Qt::Key_A:
-    cmd_msg.x=-62;
-    cmd_msg.y=62;
-    cmd_msg.z=2;
-    cmd_msg.w=-45;
+    cmd_msg.x=62;
+    cmd_msg.theta=20;
     pub_cmd.publish(cmd_msg);
 //qDebug() <<"A";
 break;

@@ -94,7 +94,7 @@ public:
         speed = new QwtDial(centralWidget);
         speed->setObjectName(QStringLiteral("speed"));
         speed->setGeometry(QRect(1180, 10, 201, 191));
-        speed->setUpperBound(40);
+        speed->setUpperBound(99);
         speed->setScaleMaxMajor(10);
         speed->setScaleMaxMinor(5);
         speed->setTotalSteps(100u);
@@ -103,8 +103,12 @@ public:
         wheel = new QwtDial(centralWidget);
         wheel->setObjectName(QStringLiteral("wheel"));
         wheel->setGeometry(QRect(900, 270, 221, 201));
-        wheel->setLowerBound(-90);
-        wheel->setUpperBound(90);
+        QFont font;
+        font.setPointSize(6);
+        font.setItalic(true);
+        wheel->setFont(font);
+        wheel->setLowerBound(-721);
+        wheel->setUpperBound(721);
         wheel->setScaleMaxMajor(10);
         wheel->setScaleMaxMinor(5);
         wheel->setTotalSteps(100u);
@@ -136,9 +140,10 @@ public:
         speed_num->setWordWrap(false);
         wheel_2 = new QwtDial(centralWidget);
         wheel_2->setObjectName(QStringLiteral("wheel_2"));
-        wheel_2->setGeometry(QRect(1170, 260, 231, 201));
-        wheel_2->setLowerBound(-90);
-        wheel_2->setUpperBound(90);
+        wheel_2->setGeometry(QRect(1170, 260, 241, 211));
+        wheel_2->setFont(font);
+        wheel_2->setLowerBound(-721);
+        wheel_2->setUpperBound(721);
         wheel_2->setScaleMaxMajor(10);
         wheel_2->setScaleMaxMinor(5);
         wheel_2->setTotalSteps(100u);
@@ -146,13 +151,13 @@ public:
         wheel_2->setLineWidth(4);
         wheel_n_2 = new QLabel(centralWidget);
         wheel_n_2->setObjectName(QStringLiteral("wheel_n_2"));
-        wheel_n_2->setGeometry(QRect(1240, 370, 41, 41));
+        wheel_n_2->setGeometry(QRect(1230, 370, 81, 41));
         wheel_n_2->setLineWidth(2);
         wheel_n_2->setScaledContents(true);
         wheel_n_2->setWordWrap(false);
         wheel_num_2 = new QLabel(centralWidget);
         wheel_num_2->setObjectName(QStringLiteral("wheel_num_2"));
-        wheel_num_2->setGeometry(QRect(1300, 370, 31, 41));
+        wheel_num_2->setGeometry(QRect(1310, 370, 41, 41));
         MainWindow->setCentralWidget(centralWidget);
         start->raise();
         key_board->raise();
@@ -200,7 +205,7 @@ public:
         wheel_n->setText(QApplication::translate("MainWindow", "wheel", 0));
         wheel_num->setText(QApplication::translate("MainWindow", "num", 0));
         speed_num->setText(QApplication::translate("MainWindow", "num", 0));
-        wheel_n_2->setText(QApplication::translate("MainWindow", "wheel", 0));
+        wheel_n_2->setText(QApplication::translate("MainWindow", "wheel echo", 0));
         wheel_num_2->setText(QApplication::translate("MainWindow", "num", 0));
     } // retranslateUi
 

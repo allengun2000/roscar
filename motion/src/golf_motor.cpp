@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 #include "MotorControl.h"
-#include "geometry_msgs/Quaternion.h"
+#include "geometry_msgs/Pose2D.h"
 
 
 using std::string;
@@ -9,11 +9,11 @@ using std::string;
 //Topic call back
 /*==============================================================================*/
 
-void cmdCallback(const geometry_msgs::Quaternion::ConstPtr& msg)
+void cmdCallback(const geometry_msgs::Pose2D::ConstPtr& msg)
 {
-puu_control=msg->w;
-
-puu_send2motor(msg->w*1000);
+// puu_control=msg->theta;
+// ROS_INFO("I heard: [%d]", int(msg->theta*1513.91667));
+puu_send2motor(int(msg->theta*1513.91667));
 }
 
 int main(int argc, char **argv)
