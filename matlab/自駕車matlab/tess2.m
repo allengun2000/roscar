@@ -92,7 +92,7 @@ scenario.SampleTime = 0.01;
 % laneSpecification = lanespec(4, 'Marking', marking);
 % road(scenario, roadCenters, 'Lanes', laneSpecification);
 
-roadCenters = [-35 20 0; -20 -20 0; 0 0 0; 20 20 0; 35 -20 0 ; 100 0 0];
+roadCenters = [-35 20 0; -20 -20 0; 0 0 0; 20 20 0; 35 -20 0 ; 100 0 0 ];
 
 lm = [laneMarking('Solid','Color','w'); ...
     laneMarking('Dashed','Color','y'); ...
@@ -109,6 +109,13 @@ egoCar = vehicle(scenario, 'ClassID', 1);
 
 % Add a car in front of the ego vehicle
 leadCar = vehicle(scenario, 'ClassID', 2,'Position',[100 -20 0]);
+person_ = actor(scenario, ...
+    'ClassID', 4, ...
+    'Length', 0.24, ...
+    'Width', 0.45, ...
+    'Height', 1.7, ...
+    'Position', [30.7 3.2 0], ...
+    'RCSPattern', [-8 -8;-8 -8]);
 % path(leadCar, roadCenters(2:end,2:end) , 101); % On right lane
 % 
 % % Add a car that travels at 35 m/s along the road and passes the ego vehicle
@@ -183,12 +190,14 @@ state_reward=rosmessage(pub1);
 msg.X=0;msg.Theta=0.03;
 send(pub,msg);
 % sim('sim_car_wheel')
+            egoCar.Position=[-35 20 0];
+            egoCar.Yaw=-100;
 while advance(scenario)   
 % while 1 
     % Get the scenario time
     time = scenario.SimulationTime;
     
-    msg2 = receive(sub,10);
+    msg2 = receive(sub,1);
     dt=0.1;
     
 output_xy=[msg2.Angular.X , msg2.Angular.Y]'; 
@@ -227,23 +236,40 @@ egoCar.Position=egoCar.Position+egoCar.Velocity*dt;
 %             detections = [detections; sensorDets]; %#ok<AGROW>
 %         end
 %     end
-    
+
         reward=0;
     
         laneBound = laneBoundaries(egoCar,'XDistance',0:5:30,'LocationType','Center','AllBoundaries',true);
         offset=laneBound(1).LateralOffset;
-        reward=reward-abs(offset-5.4);
+        offset=abs(offset-5.4);
+        reward=reward-offset;
+        
+       if isnan(reward)
+         reward=-10
+         egoCar.Position=[-35 20 0];
+         egoCar.Yaw=-100;
+         continue
+       end
         
         
+       refpoint=[(laneBound(2).Coordinates(2,1)+laneBound(3).Coordinates(2,1))/2,...
+           (laneBound(2).Coordinates(2,2)+laneBound(3).Coordinates(2,2))/2 ,laneBound(2).HeadingAngle]
+       corpoint=[0,0,0];
+       
+       chang_point=[([cos(degtorad(egoCar.Yaw-90)) -sin(degtorad(egoCar.Yaw-90));sin(degtorad(egoCar.Yaw-90)) cos(degtorad(egoCar.Yaw-90))]*[-refpoint(2);refpoint(1)])',0];
+      person_.Position =[chang_point(1),chang_point(2),0]+egoCar.Position;
+       stree_angle=degtorad(lateralControllerStanley(refpoint,corpoint,30))
+        
+        msg.X=15;msg.Theta=stree_angle;
+        send(pub,msg);
         
         
         send(pub1,state_reward);
-        if isnan(reward)
-            reward=-10
-            egoCar.Position=[-35 20 0];
-            egoCar.Yaw=-100;
-        end
-        state_reward.Data=[laneBound(1).LateralOffset ,reward,0 ,egoCar.Position];
+
+        
+        
+        
+        state_reward.Data=[offset ,reward,0 ,egoCar.Position];
     % Update the tracker if there are new detections
 %     if any(isValidTime)
 %         vehicleLength = sensors{1}.ActorProfiles.Length;

@@ -24,7 +24,7 @@ void setup() {
   delay(1000);
   CAN.sendMsgBuf(0x7C0, 0, 2, stmp2);  //0x7C0 = CAN-ID Kind of Message;stmp2 = set up the zero position
   delay(1000);
-   Enc2.begin(MODE_AB_PHASE);
+   Enc0.begin(MODE_AB_PHASE);
    pinMode(4, OUTPUT);
    pinMode(5, OUTPUT);
    digitalWrite(4, LOW); 
@@ -64,7 +64,7 @@ void loop() {
      Serial1.print('\r');
      Serial1.print(angle);
      Serial1.print('\r');
-Serial1.println(Enc2.read()); //4294967296
+Serial1.println(Enc0.read()); //4294967296
 
 if (Serial1.available() > 0) {
   

@@ -14,8 +14,8 @@ MainWindow::MainWindow(int argc, char** argv ,QWidget *parent) :
 
     sub = n->subscribe("/test",10 ,&MainWindow::callback ,this);
     sub1 = n->subscribe("/cmd",10 ,&MainWindow::callback1 ,this);
-    sub2= n->subscribe("/wheelangle",10,&MainWindow::callback2,this);
-    sub3= n->subscribe("/speed_encoder",10,&MainWindow::callback3,this);
+    sub2= n->subscribe("/wheelFB",10,&MainWindow::callback2,this);
+    sub3= n->subscribe("/duino_velocity",10,&MainWindow::callback3,this);
     it = new image_transport::ImageTransport(*n);
     sub_image = it->subscribe("/usb_cam/image_raw", 1, &MainWindow::imageCallback,this);
     pub_cmd  = n->advertise<geometry_msgs::Pose2D>("/cmd",0);
@@ -93,9 +93,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_start_clicked()
 {
-
+        ros::NodeHandle nh;
+    nh.setParam("/statego",1);
      ui->statusBar->showMessage(tr("Connect"));
-//     ui->speed->setText(QString::number(999));
 
 }
 void MainWindow::ShowData()
@@ -119,13 +119,17 @@ void MainWindow::callback1(const geometry_msgs::Pose2D::ConstPtr& msg){
     ui->wheel_num->setText(QString("%1").arg(msg->theta));
     ui->wheel->setValue(msg->theta);
     ui->wheel->show();
+
+
 }
 void MainWindow::callback2(const std_msgs::Float32::ConstPtr& msg){
+    wheel_showangle = msg->data;
     ui->wheel_num_2->setText(QString("%1").arg(msg->data));
     ui->wheel_2->setValue(msg->data);
     ui->wheel_2->show();
+
 }
-void MainWindow::callback3(const std_msgs::Float32::ConstPtr& msg){
+void MainWindow::callback3(const std_msgs::Float64::ConstPtr& msg){
     ui->speed_num->setText(QString("%1").arg(msg->data));
     ui->speed->setValue(msg->data);
     ui->speed->show();
@@ -139,6 +143,8 @@ void MainWindow::imageCallback(const sensor_msgs::ImageConstPtr& msg)
     cv_ptr = cv_bridge::toCvCopy(msg, "bgr8");
         Main_frame=cv_ptr->image;
         cv::resize(Main_frame,result_frame,Size(ui->picture->width(),ui->picture->height()),0,0,INTER_LINEAR);
+//        line(result_frame, Point(result_frame.cols/2,result_frame.rows), \
+             Point(result_frame.cols/2,result_frame.rows-200), Scalar(255,255,54), 5);
         QPixmap des_pic =cvMatToQPixmap(result_frame);
         ui->picture->setPixmap(des_pic);
   }
@@ -295,4 +301,11 @@ qDebug() << event->key();
 break;
 }
 }
+}
+
+void MainWindow::on_stop_clicked()
+{
+    ros::NodeHandle nh;
+    nh.setParam("/statego",0);
+    ui->statusBar->showMessage(tr("stop"));
 }

@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[18];
-    char stringdata0[252];
+    QByteArrayData data[19];
+    char stringdata0[268];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -46,7 +46,8 @@ QT_MOC_LITERAL(13, 182, 26), // "sensor_msgs::ImageConstPtr"
 QT_MOC_LITERAL(14, 209, 14), // "cvMatToQPixmap"
 QT_MOC_LITERAL(15, 224, 7), // "cv::Mat"
 QT_MOC_LITERAL(16, 232, 5), // "inMat"
-QT_MOC_LITERAL(17, 238, 13) // "cvMatToQImage"
+QT_MOC_LITERAL(17, 238, 13), // "cvMatToQImage"
+QT_MOC_LITERAL(18, 252, 15) // "on_stop_clicked"
 
     },
     "MainWindow\0on_start_clicked\0\0ShowData\0"
@@ -55,7 +56,7 @@ QT_MOC_LITERAL(17, 238, 13) // "cvMatToQImage"
     "callback2\0std_msgs::Float32::ConstPtr\0"
     "callback3\0imageCallback\0"
     "sensor_msgs::ImageConstPtr\0cvMatToQPixmap\0"
-    "cv::Mat\0inMat\0cvMatToQImage"
+    "cv::Mat\0inMat\0cvMatToQImage\0on_stop_clicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -65,7 +66,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      10,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -73,15 +74,16 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   59,    2, 0x08 /* Private */,
-       3,    0,   60,    2, 0x08 /* Private */,
-       4,    1,   61,    2, 0x08 /* Private */,
-       7,    1,   64,    2, 0x08 /* Private */,
-       9,    1,   67,    2, 0x08 /* Private */,
-      11,    1,   70,    2, 0x08 /* Private */,
-      12,    1,   73,    2, 0x08 /* Private */,
-      14,    1,   76,    2, 0x08 /* Private */,
-      17,    1,   79,    2, 0x08 /* Private */,
+       1,    0,   64,    2, 0x08 /* Private */,
+       3,    0,   65,    2, 0x08 /* Private */,
+       4,    1,   66,    2, 0x08 /* Private */,
+       7,    1,   69,    2, 0x08 /* Private */,
+       9,    1,   72,    2, 0x08 /* Private */,
+      11,    1,   75,    2, 0x08 /* Private */,
+      12,    1,   78,    2, 0x08 /* Private */,
+      14,    1,   81,    2, 0x08 /* Private */,
+      17,    1,   84,    2, 0x08 /* Private */,
+      18,    0,   87,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -93,6 +95,7 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void, 0x80000000 | 13,    6,
     QMetaType::QPixmap, 0x80000000 | 15,   16,
     QMetaType::QImage, 0x80000000 | 15,   16,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -114,6 +117,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             if (_a[0]) *reinterpret_cast< QPixmap*>(_a[0]) = _r; }  break;
         case 8: { QImage _r = _t->cvMatToQImage((*reinterpret_cast< const cv::Mat(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QImage*>(_a[0]) = _r; }  break;
+        case 9: _t->on_stop_clicked(); break;
         default: ;
         }
     }
@@ -144,13 +148,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 10)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 10;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 9)
+        if (_id < 10)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 9;
+        _id -= 10;
     }
     return _id;
 }

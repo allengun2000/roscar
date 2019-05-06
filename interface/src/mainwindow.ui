@@ -305,10 +305,10 @@
      </font>
     </property>
     <property name="lowerBound">
-     <double>-721.000000000000000</double>
+     <double>-35.000000000000000</double>
     </property>
     <property name="upperBound">
-     <double>721.000000000000000</double>
+     <double>35.000000000000000</double>
     </property>
     <property name="scaleMaxMajor">
      <number>10</number>
@@ -361,6 +361,19 @@
      <string>num</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="stop">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>470</y>
+      <width>99</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>stop</string>
+    </property>
+   </widget>
    <zorder>start</zorder>
    <zorder>key_board</zorder>
    <zorder>picture</zorder>
@@ -378,6 +391,7 @@
    <zorder>wheel_2</zorder>
    <zorder>wheel_n_2</zorder>
    <zorder>wheel_num_2</zorder>
+   <zorder>stop</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

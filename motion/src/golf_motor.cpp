@@ -13,7 +13,9 @@ void cmdCallback(const geometry_msgs::Pose2D::ConstPtr& msg)
 {
 // puu_control=msg->theta;
 // ROS_INFO("I heard: [%d]", int(msg->theta*1513.91667));
-puu_send2motor(int(msg->theta*1513.91667));
+if(msg->theta>-720 && msg->theta<720){
+puu_send2motor(int(msg->theta*1513.91667),int(msg->y));
+}
 }
 
 int main(int argc, char **argv)

@@ -7,7 +7,8 @@ project(matlab_strage)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs)
+find_package(catkin REQUIRED COMPONENTS
+  message_generation roscpp rospy std_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -50,11 +51,9 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs)
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(FILES
+  later_matlab.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -64,10 +63,9 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(DEPENDENCIES
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -99,6 +97,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
+  CATKIN_DEPENDS
+  message_runtime
 #  INCLUDE_DIRS include
 #  LIBRARIES matlab_strage
 #  CATKIN_DEPENDS other_catkin_pkg
@@ -108,10 +108,26 @@ catkin_package(
 ###########
 ## Build ##
 ###########
-
+set(ic_source
+include/matlab_strage/rtwtypes.h
+include/matlab_strage/later_car_types.h
+include/matlab_strage/rt_nonfinite.h
+include/matlab_strage/later_car.h
+include/matlab_strage/later_car_terminate.h
+include/matlab_strage/later_car_initialize.h
+include/matlab_strage/rt_nonfinite.cpp
+include/matlab_strage/later_car.cpp
+include/matlab_strage/later_car_terminate.cpp
+include/matlab_strage/later_car_initialize.cpp
+include/matlab_strage/angleUtilities.h
+include/matlab_strage/angleUtilities.cpp
+)
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
+  include ${catkin_INCLUDE_DIRS}
+  include/matlab_strage
+  /usr/local/MATLAB/R2019a/extern/include
 # include
 # ${catkin_INCLUDE_DIRS}
 )
@@ -193,3 +209,13 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+
+add_executable(later_control
+  src/later_control.cpp
+  ${ic_source}
+)
+add_dependencies(later_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(later_control
+  ${catkin_LIBRARIES}
+)

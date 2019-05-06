@@ -19,7 +19,7 @@
 #include<qwt/qwt_dial.h>
 #include<qwt/qwt_dial_needle.h>
 #include "geometry_msgs/Pose2D.h"
-
+#include "std_msgs/Float64.h"
 #include "std_msgs/Float32.h"
 using namespace std;
 using namespace cv;
@@ -50,7 +50,7 @@ ros::NodeHandle *n;
     image_transport::Subscriber sub_image ;
     QVector<double> X_polt;
     QVector<double> Y_polt;
-
+    double wheel_showangle;
 
     QwtDialSimpleNeedle *dial_needle_;
 //    QwtDialSimpleNeedle *dial_needle_1;
@@ -67,15 +67,18 @@ private slots:
     void callback(const std_msgs::String::ConstPtr& msg);
     void callback1(const geometry_msgs::Pose2D::ConstPtr& msg);
     void callback2(const std_msgs::Float32::ConstPtr& msg);
-    void callback3(const std_msgs::Float32::ConstPtr& msg);
+    void callback3(const std_msgs::Float64::ConstPtr& msg);
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     QPixmap cvMatToQPixmap( const cv::Mat &inMat);
     QImage cvMatToQImage( const cv::Mat &inMat );
 
 
+    void on_stop_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTimer *mTimer;
+
 };
 
 #endif // MAINWINDOW_H

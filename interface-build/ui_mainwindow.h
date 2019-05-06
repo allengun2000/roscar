@@ -48,6 +48,7 @@ public:
     QwtDial *wheel_2;
     QLabel *wheel_n_2;
     QLabel *wheel_num_2;
+    QPushButton *stop;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -142,8 +143,8 @@ public:
         wheel_2->setObjectName(QStringLiteral("wheel_2"));
         wheel_2->setGeometry(QRect(1170, 260, 241, 211));
         wheel_2->setFont(font);
-        wheel_2->setLowerBound(-721);
-        wheel_2->setUpperBound(721);
+        wheel_2->setLowerBound(-35);
+        wheel_2->setUpperBound(35);
         wheel_2->setScaleMaxMajor(10);
         wheel_2->setScaleMaxMinor(5);
         wheel_2->setTotalSteps(100u);
@@ -158,6 +159,9 @@ public:
         wheel_num_2 = new QLabel(centralWidget);
         wheel_num_2->setObjectName(QStringLiteral("wheel_num_2"));
         wheel_num_2->setGeometry(QRect(1310, 370, 41, 41));
+        stop = new QPushButton(centralWidget);
+        stop->setObjectName(QStringLiteral("stop"));
+        stop->setGeometry(QRect(480, 470, 99, 27));
         MainWindow->setCentralWidget(centralWidget);
         start->raise();
         key_board->raise();
@@ -176,6 +180,7 @@ public:
         wheel_2->raise();
         wheel_n_2->raise();
         wheel_num_2->raise();
+        stop->raise();
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 1409, 31));
@@ -207,6 +212,7 @@ public:
         speed_num->setText(QApplication::translate("MainWindow", "num", 0));
         wheel_n_2->setText(QApplication::translate("MainWindow", "wheel echo", 0));
         wheel_num_2->setText(QApplication::translate("MainWindow", "num", 0));
+        stop->setText(QApplication::translate("MainWindow", "stop", 0));
     } // retranslateUi
 
 };
