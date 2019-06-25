@@ -30,27 +30,41 @@ int main(int argc, char *argv[])
 	ros::Subscriber sub = n.subscribe("pic_source", 1000, chatterCallback);
 
 	ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
-	cv::namedWindow("Images");
+	ros::Publisher pub1 = n.advertise<vision_pro::line_inform>("line_info", 1000);
+	vision_pro::line_inform line_msg;
+	cv::namedWindow("Imagess");
 	ros::Rate loop_rate(1000);
 	int count=0;
 	while (ros::ok())
 	{
-		
-		std_msgs::String msg;
+		cv::Mat img_ = cv::imread("/home/iris/iriscar.png");
+		if(img_.cols>2){cv::imshow("Imagess", img_);}
+		cv::waitKey(10);
+// line_msg.state=1;
+// line_msg.dot_x.clear();
+// line_msg.dot_x.push_back(1);
+// line_msg.dot_x.push_back(2);
+// line_msg.dot_x.push_back(10);
 
-		std::stringstream ss;
-		ss << "hello world " << count;
-		msg.data = ss.str();
+// line_msg.dot_y.clear();
+// line_msg.dot_y.push_back(line_msg.dot_x[2]);
+// line_msg.dot_y.push_back(line_msg.dot_x[1]);
+// line_msg.dot_y.push_back(line_msg.dot_x[0]);
 
-		ROS_INFO("%s", msg.data.c_str());
+// line_msg.dot_num=line_msg.dot_x.size();
+// pub1.publish(line_msg);
+// if(Main_frame.cols>2){cv::imshow("Images", Main_frame);}
 
-		chatter_pub.publish(msg);
-if(Main_frame.cols>2){cv::imshow("Images", Main_frame);}
-cv::waitKey(10);
-		ros::spinOnce();
+		// ros::spinOnce();
 
-		loop_rate.sleep();
+		// loop_rate.sleep();
 		++count;
 	}
+	cv::Mat img_cordinate(510,240, CV_8UC3);
+	// for(int j=0;j<img_.rows;j++){
+	// 	for(int i=0;j<img_.cols;i++){
+
+	// 	}
+	// }
 	return 0;
 }

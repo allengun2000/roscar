@@ -9,7 +9,10 @@ project(vision)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   message_generation
-  roscpp cv_bridge image_transport message_runtime sensor_msgs)
+  roscpp cv_bridge image_transport message_runtime sensor_msgs
+    pcl_ros
+    geometry_msgs
+    pcl_conversions)
 #find_package(OpenCV)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -213,6 +216,15 @@ add_executable(road
 )
 add_dependencies(road ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(road
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
+
+add_executable(tf_light
+  src/tf_light.cpp
+)
+add_dependencies(tf_light ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tf_light
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )

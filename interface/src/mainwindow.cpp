@@ -16,10 +16,15 @@ MainWindow::MainWindow(int argc, char** argv ,QWidget *parent) :
     sub1 = n->subscribe("/cmd",10 ,&MainWindow::callback1 ,this);
     sub2= n->subscribe("/wheelFB",10,&MainWindow::callback2,this);
     sub3= n->subscribe("/duino_velocity",10,&MainWindow::callback3,this);
+    sub4= n->subscribe("/line_info",10,&MainWindow::callback4,this);
     it = new image_transport::ImageTransport(*n);
-    sub_image = it->subscribe("/usb_cam/image_raw", 1, &MainWindow::imageCallback,this);
+    sub_image = it->subscribe("car_line/image_raw", 1, &MainWindow::imageCallback,this);
+    sub_image1 = it->subscribe("/debug_image", 1, &MainWindow::imageCallback1,this);
     pub_cmd  = n->advertise<geometry_msgs::Pose2D>("/cmd",0);
-
+    pub_parm  = n->advertise<std_msgs::Bool>("/ParmIsChange",0);
+    parm_change.data=1;
+    HSV.push_back(360);HSV.push_back(0);HSV.push_back(255);HSV.push_back(0);HSV.push_back(255);HSV.push_back(0);
+    n->setParam("/hsv",HSV);
 
     ui->oil->setMode(QwtDial::RotateNeedle);
     ui->oil->setValue(0);
@@ -52,21 +57,27 @@ MainWindow::MainWindow(int argc, char** argv ,QWidget *parent) :
 
     ui->way_info->addGraph();
     ui->way_info->graph(0)->setPen(QPen(Qt::blue));
-    ui->way_info->graph(0)->setBrush(QBrush(QColor(0,0,255,20)));
-    ui->way_info->graph(0)->setLineStyle(QCPGraph::lsNone);
-    ui->way_info->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+//    ui->way_info->graph(0)->setBrush(QBrush(QColor(0,0,255,20)));
+//    ui->way_info->graph(0)->setLineStyle(QCPGraph::lsNone);
+//    ui->way_info->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+    ui->way_info->addGraph();
+    ui->way_info->graph(1)->setPen(QPen(Qt::red));
+//    ui->way_info->graph(1)->setBrush(QBrush(QColor(0,0,255,20)));
+    ui->way_info->addGraph();
+    ui->way_info->graph(2)->setPen(QPen(Qt::green));
+//    ui->way_info->graph(2)->setBrush(QBrush(QColor(0,0,255,20)));
+    ui->way_info->addGraph();
+    ui->way_info->graph(3)->setPen(QPen(Qt::black));
+        ui->way_info->addGraph();
+    ui->way_info->graph(4)->setPen(QPen(Qt::cyan));
+    
     ui->way_info->xAxis2->setVisible(true);
     ui->way_info->xAxis2->setTickLabels(false);
     ui->way_info->yAxis2->setVisible(true);
     ui->way_info->yAxis2->setTickLabels(false);
-    ui->way_info->xAxis->setRange(0,100);
-    ui->way_info->yAxis->setRange(0, 100);
-    Y_polt.append(10);
-    Y_polt.append(30);
-    X_polt.append(20);
-    X_polt.append(60);
-    ui->way_info->graph(0)->setData(X_polt, Y_polt);
-    ui->way_info->replot();
+    ui->way_info->xAxis->setRange(-400,400);
+    ui->way_info->yAxis->setRange(0, 800);
+
     ui->way_info->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
 
     Mat img(250, 250, CV_8UC3, Scalar(255,255,255));
@@ -119,7 +130,14 @@ void MainWindow::callback1(const geometry_msgs::Pose2D::ConstPtr& msg){
     ui->wheel_num->setText(QString("%1").arg(msg->theta));
     ui->wheel->setValue(msg->theta);
     ui->wheel->show();
-
+    double ang=((msg->theta +720)* (70) / (1440) -35)* M_PI / 180;
+    QVector<double> X;
+    QVector<double> Y;
+    X.push_back(0);Y.push_back(0);
+    X.push_back(200*sin(ang));
+    Y.push_back(200*cos(ang));
+    ui->way_info->graph(3)->setData(X,Y);
+    ui->way_info->replot();
 
 }
 void MainWindow::callback2(const std_msgs::Float32::ConstPtr& msg){
@@ -127,12 +145,45 @@ void MainWindow::callback2(const std_msgs::Float32::ConstPtr& msg){
     ui->wheel_num_2->setText(QString("%1").arg(msg->data));
     ui->wheel_2->setValue(msg->data);
     ui->wheel_2->show();
-
+    QVector<double> X;
+    QVector<double> Y;
+    X.push_back(0);Y.push_back(0);
+    X.push_back(200*sin((msg->data)* M_PI / 180));
+    Y.push_back(200*cos((msg->data)* M_PI / 180));
+    ui->way_info->graph(4)->setData(X,Y);
+    ui->way_info->replot();
 }
 void MainWindow::callback3(const std_msgs::Float64::ConstPtr& msg){
     ui->speed_num->setText(QString("%1").arg(msg->data));
     ui->speed->setValue(msg->data);
     ui->speed->show();
+}
+void MainWindow::callback4(const vision_pro::line_inform::ConstPtr& msg){
+    Y_polt.clear();
+    X_polt.clear();
+    Y_polt.resize(0);
+    X_polt.resize(0);
+    Y_polt_L.clear();
+    X_polt_L.clear();
+    Y_polt_L.resize(0);
+    X_polt_L.resize(0);
+    Y_polt_R.clear();
+    X_polt_R.clear();
+    Y_polt_R.resize(0);
+    X_polt_R.resize(0);
+
+    for(int i=0;i<msg->dot_num;i++){
+        Y_polt.push_back(-msg->mid_y[i]);
+        X_polt.push_back(msg->mid_x[i]);
+        Y_polt_L.push_back(-msg->line1_y[i]);
+        X_polt_L.push_back(msg->line1_x[i]);
+        Y_polt_R.push_back(-msg->line2_y[i]);
+        X_polt_R.push_back(msg->line2_x[i]);
+    }
+    ui->way_info->graph(0)->setData(Y_polt,X_polt );
+    ui->way_info->graph(1)->setData(Y_polt_L,X_polt_L );
+    ui->way_info->graph(2)->setData(Y_polt_R,X_polt_R );
+    ui->way_info->replot();
 }
 void MainWindow::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -155,7 +206,27 @@ void MainWindow::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   }
 
 }
+void MainWindow::imageCallback1(const sensor_msgs::ImageConstPtr& msg)
+{
+  cv_bridge::CvImagePtr cv_ptr;
+  try
+  {
 
+    cv_ptr = cv_bridge::toCvCopy(msg, "bgr8");
+        Main_frame=cv_ptr->image;
+        cv::resize(Main_frame,result_frame,Size(ui->picture->width(),ui->picture->height()),0,0,INTER_LINEAR);
+//        line(result_frame, Point(result_frame.cols/2,result_frame.rows), \
+             Point(result_frame.cols/2,result_frame.rows-200), Scalar(255,255,54), 5);
+        QPixmap des_pic =cvMatToQPixmap(result_frame);
+        ui->picture_2->setPixmap(des_pic);
+  }
+  catch (cv_bridge::Exception& e)
+  {
+    ROS_ERROR("cv_bridge exception: %s", e.what());
+    return;
+  }
+
+}
 
 
 QImage MainWindow::cvMatToQImage( const cv::Mat &inMat ){
@@ -279,20 +350,20 @@ case Qt::Key_W:
 pub_cmd.publish(cmd_msg);
 break;
 case Qt::Key_S:
-    cmd_msg.x=62;
-    cmd_msg.theta=20;
+    cmd_msg.x=5;
+    cmd_msg.theta=90;
     pub_cmd.publish(cmd_msg);
 //qDebug() <<"S";
 break;
 case Qt::Key_D:
-    cmd_msg.x=62;
-    cmd_msg.theta=20;
+    cmd_msg.x=0;
+    cmd_msg.theta=0;
     pub_cmd.publish(cmd_msg);
 //qDebug() <<"D";
 break;
 case Qt::Key_A:
-    cmd_msg.x=62;
-    cmd_msg.theta=20;
+    cmd_msg.x=5;
+    cmd_msg.theta=90;
     pub_cmd.publish(cmd_msg);
 //qDebug() <<"A";
 break;
@@ -308,4 +379,66 @@ void MainWindow::on_stop_clicked()
     ros::NodeHandle nh;
     nh.setParam("/statego",0);
     ui->statusBar->showMessage(tr("stop"));
+    ui->learn->setChecked(false);
+
+}
+
+void MainWindow::on_learn_stateChanged(int arg1)
+{
+    ros::NodeHandle nh;
+
+     if(ui->learn->isChecked()){
+      nh.setParam("/statego",2);
+     }else{
+     nh.setParam("/statego",0);
+     }
+}
+
+
+void MainWindow::on_hmax_valueChanged(double value)
+{
+    ros::NodeHandle nh;
+        HSV[0]=value;
+        nh.setParam("/golf/hsv",HSV);
+        pub_parm.publish(parm_change);
+}
+
+void MainWindow::on_h_min_valueChanged(double value)
+{
+    ros::NodeHandle nh;
+        HSV[1]=value;
+        nh.setParam("/golf/hsv",HSV);
+        pub_parm.publish(parm_change);
+}
+
+void MainWindow::on_s_max_valueChanged(double value)
+{
+    ros::NodeHandle nh;
+        HSV[2]=value;
+        nh.setParam("/golf/hsv",HSV);
+        pub_parm.publish(parm_change);
+}
+
+void MainWindow::on_s_min_valueChanged(double value)
+{
+    ros::NodeHandle nh;
+        HSV[3]=value;
+        nh.setParam("/golf/hsv",HSV);
+        pub_parm.publish(parm_change);
+}
+
+void MainWindow::on_v_max_valueChanged(double value)
+{
+    ros::NodeHandle nh;
+        HSV[4]=value;
+        nh.setParam("/golf/hsv",HSV);
+        pub_parm.publish(parm_change);
+}
+
+void MainWindow::on_v_min_valueChanged(double value)
+{
+    ros::NodeHandle nh;
+        HSV[5]=value;
+        nh.setParam("/golf/hsv",HSV);
+        pub_parm.publish(parm_change);
 }

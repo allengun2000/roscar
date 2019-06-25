@@ -6,6 +6,22 @@
 
 #IncludeRegexTransform: 
 
+/home/allen/linux/catkin_ws/devel/include/vision_pro/line_inform.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+
 /home/allen/linux/catkin_ws/src/interface-build/interface_automoc.cpp
 moc_qcustomplot.cpp
 /home/allen/linux/catkin_ws/src/interface-build/moc_qcustomplot.cpp
@@ -157,8 +173,14 @@ qwt/qwt_dial_needle.h
 -
 geometry_msgs/Pose2D.h
 /home/allen/linux/catkin_ws/src/interface/src/geometry_msgs/Pose2D.h
+std_msgs/Float64.h
+/home/allen/linux/catkin_ws/src/interface/src/std_msgs/Float64.h
 std_msgs/Float32.h
 /home/allen/linux/catkin_ws/src/interface/src/std_msgs/Float32.h
+std_msgs/Bool.h
+/home/allen/linux/catkin_ws/src/interface/src/std_msgs/Bool.h
+vision_pro/line_inform.h
+/home/allen/linux/catkin_ws/src/interface/src/vision_pro/line_inform.h
 
 /opt/ros/kinetic/include/cv_bridge/cv_bridge.h
 sensor_msgs/Image.h
@@ -2318,7 +2340,39 @@ stdexcept
 string
 -
 
+/opt/ros/kinetic/include/std_msgs/Bool.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+
 /opt/ros/kinetic/include/std_msgs/Float32.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+
+/opt/ros/kinetic/include/std_msgs/Float64.h
 string
 -
 vector
@@ -2435,6 +2489,12 @@ qlist.h
 -
 qdebug.h
 -
+
+/usr/include/qwt/qwt_slider.h
+qwt_global.h
+/usr/include/qwt/qwt_global.h
+qwt_abstract_slider.h
+/usr/include/qwt/qwt_abstract_slider.h
 
 /usr/include/qwt/qwt_text.h
 qwt_global.h
@@ -5716,6 +5776,10 @@ qscrollerproperties.h
 qstatusbar.h
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstatusbar.h
 
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTabWidget
+qtabwidget.h
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtabwidget.h
+
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QToolBar
 qtoolbar.h
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtoolbar.h
@@ -6907,6 +6971,8 @@ QtWidgets/QPushButton
 -
 QtWidgets/QStatusBar
 -
+QtWidgets/QTabWidget
+-
 QtWidgets/QToolBar
 -
 QtWidgets/QWidget
@@ -6915,4 +6981,6 @@ qcustomplot.h
 qcustomplot.h
 qwt_dial.h
 qwt_dial.h
+qwt_slider.h
+qwt_slider.h
 

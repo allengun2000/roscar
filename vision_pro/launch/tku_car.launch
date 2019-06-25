@@ -1,0 +1,16 @@
+<launch>
+	<node pkg= "tensorflow_object_detector" name="detect_ros" type="detect_ros.py"  output="screen"> 
+    <remap from="image" to="/usb_cam_node/image_raw"/>
+	</node>
+
+  <node pkg="usb_cam" type="usb_cam_node" name="usb_cam_node" output="screen">
+    <param name="pixel_format" value="yuyv"/>
+    <param name="video_device" value="/dev/video1"/>
+  </node>
+
+  <node pkg="vision_pro" type="line" name="carline"></node>
+  <node pkg="vision" type="vision_cov" name="cov"></node>
+  <node pkg="interface" type="interface" name="interface"></node>
+  <node pkg="motion" type="golf_car" name="motor"></node>
+  <!--<node pkg="matlab_strage" type="splearn.py" name="learn"></node>-->
+</launch>

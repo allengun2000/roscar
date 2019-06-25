@@ -1,0 +1,12 @@
+int32 state
+int32 dot_num
+float32[] line1_x
+float32[] line1_y
+float32[] line2_x
+float32[] line2_y
+float32[] mid_x
+float32[] mid_y
+float32 offest
+float32[] curve
+float32 head_angle
+float32 angle_re

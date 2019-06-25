@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 geometry_msgs
   message_generation
-  cv_bridge image_transport message_runtime sensor_msgs
+  cv_bridge image_transport message_runtime sensor_msgs vision_pro
 )
 find_package(OpenCV)
 ## System dependencies are found with CMake's conventions
@@ -236,7 +236,7 @@ add_executable(interface
   ${QT_SOURCES}
   ${QT_MOC_HPP} ${UI_HEADERS}
 )
-add_dependencies(interface ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(interface ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} vision_pro_gencpp)
 target_link_libraries(interface
   ${catkin_LIBRARIES}
     Qt5::Core

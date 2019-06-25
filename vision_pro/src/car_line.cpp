@@ -15,16 +15,134 @@ void chatterCallback(const vision::image_cv::ConstPtr& msg)
 	}
     
 }
+
+
+
+
+
+
+void settingmap(float j,float i,float *x_cor,float *y_cor){
+//    int x_cor; 
+  
+   if(j<=479&&j>465){
+        if(i<=355){//118
+        *x_cor=(17*(479-j)/(479-465))+238;*y_cor=150*(355-i)/(355-(113-(113-96)*(j-465)/(479-465)));
+        }
+        if(i>355){//511
+        *x_cor=(17*(479-j)/(479-465))+238;*y_cor=-150*(i-355)/((585+(597-585)*(j-465)/(479-465))-355);
+        }
+    }
+
+    if(j<=465&&j>450){
+        if(i<=355){//&&i>=129
+        *x_cor=(20*(465-j)/(465-450))+255;*y_cor=150*(355-i)/(355-(128-(128-113)*(j-450)/(465-450)));
+        }
+        if(i>355){//i<=500&&
+        *x_cor=(20*(465-j)/(465-450))+255;*y_cor=-150*(i-355)/((570+(585-570)*(j-450)/(465-450))-355);
+        }
+    }
+  
+    if(j<=450&&j>438){
+        if(i<=355){//&&i>=140
+        *x_cor=(20*(450-j)/(450-438))+275;*y_cor=150*(355-i)/(355-(140-(140-128)*(j-438)/(450-438)));
+        }
+        if(i>355){//i<=490&&
+        *x_cor=(20*(450-j)/(450-438))+275;*y_cor=-150*(i-355)/((560+(570-560)*(j-438)/(450-438))-355);
+        }
+    }
+    
+    if(j<=438&&j>425){
+        if(i<=355){//&&i>=150
+        *x_cor=(20*(438-j)/(438-425))+295;*y_cor=150*(355-i)/(355-(152-(152-140)*(j-425)/(438-425)));
+        }
+        if(i>355){//i<=481&&
+        *x_cor=(20*(438-j)/(438-425))+295;*y_cor=-150*(i-355)/((547+(560-547)*(j-425)/(438-425))-355);
+        }
+    }
+
+    if(j<=425&&j>415){
+        if(i<=355){//&&i>=159
+        *x_cor=(20*(425-j)/(425-415))+315;*y_cor=150*(355-i)/(355-(162-(162-152)*(j-415)/(425-415)));
+        }
+        if(i>355){//i<=471&&
+        *x_cor=(20*(425-j)/(425-415))+315;*y_cor=-150*(i-355)/((538+(547-538)*(j-415)/(425-415))-355);
+        }
+    }
+    if(j<=415&&j>405){
+        if(i<=355){//&&i>=168
+        *x_cor=(20*(415-j)/(415-405))+335;*y_cor=150*(355-i)/(355-(173-(173-162)*(j-405)/(415-405)));
+        }
+        if(i>355){//i<=464&&
+        *x_cor=(20*(415-j)/(415-405))+335;*y_cor=-150*(i-355)/((530+(538-530)*(j-405)/(415-405))-355);
+        }
+    }
+    if(j<=405&&j>396){
+        if(i<=355){//&&i>=174
+        *x_cor=(20*(405-j)/(405-396))+355;*y_cor=150*(355-i)/(355-(182-(182-173)*(j-396)/(405-396)));
+        }
+        if(i>355){//i<=457&&
+        *x_cor=(20*(405-j)/(405-396))+355;*y_cor=-150*(i-355)/((522+(530-522)*(j-396)/(405-396))-355);
+        }
+    }
+    if(j<=396&&j>388){
+        if(i<=355){//&&i>=182
+        *x_cor=(20*(396-j)/(396-388))+375;*y_cor=150*(355-i)/(355-(188-(188-182)*(j-388)/(396-388)));
+        }
+        if(i>355){//i<=450&&
+        *x_cor=(20*(396-j)/(396-388))+375;*y_cor=-150*(i-355)/((516+(522-516)*(j-388)/(396-388))-355);
+        }
+    }
+    if(j<=388&&j>381){
+        if(i<=355){//&&i>=188
+        *x_cor=(20*(388-j)/(388-381))+395;*y_cor=150*(355-i)/(355-(196-(196-188)*(j-381)/(388-381)));
+        }
+        if(i>355){//i<=443&&
+        *x_cor=(20*(388-j)/(388-381))+395;*y_cor=-150*(i-355)/((510+(516-510)*(j-381)/(388-381))-355);
+        }
+    }
+    if(j<=381&&j>374){
+        if(i<=355){//&&i>=192
+        *x_cor=(20*(381-j)/(381-374))+415;*y_cor=150*(355-i)/(355-(203-(203-196)*(j-374)/(381-374)));
+        }
+        if(i>355){//i<=438&&
+        *x_cor=(20*(381-j)/(381-374))+415;*y_cor=-150*(i-355)/((504+(510-504)*(j-374)/(381-374))-355);
+        }
+    }
+    if(j<=374){//&&j>=368
+        if(i<=355){//&&i>=197
+        *x_cor=(20*(374-j)/(374-368))+435;*y_cor=150*(355-i)/(355-(208-(208-203)*(j-368)/(374-368)));
+        }
+        if(i>355){//i<=434&&
+        *x_cor=(20*(374-j)/(374-368))+435;*y_cor=-150*(i-355)/((499+(504-499)*(j-368)/(374-368))-355);
+        }
+    }
+    
+    // Point cor(x_cor,y_cor);
+    //return cor;
+    
+}
+
+
+
+
+
+
+
+
 int main(int argc, char *argv[])
 {
    ros::init(argc, argv, "car_line");
 	ros::NodeHandle n;
-	ros::Subscriber sub = n.subscribe("pic_source", 10, chatterCallback);
-    Parameter_getting(1);
-    ros::Subscriber sub_parm = n.subscribe("/ParmIsChange", 10, ParmIsChangeCallback);
-    VideoCapture capture("/home/allen/linux/car_line/model/20171017-182945CO.AVI");
+    ros::Subscriber sub = n.subscribe("bag_picture", 10, chatterCallback);
+    // Parameter_getting(1);
+    // ros::Subscriber sub_parm = n.subscribe("/ParmIsChange", 10, ParmIsChangeCallback);
+    pub1 = n.advertise<vision_pro::line_inform>("line_info", 1000);
+    pub2 = n.advertise<vision::image_cv>("pic_source", 1000);
+	
+    VideoCapture capture("/home/allen/linux/car_line/model/20150210-130451CO.AVI");
+
     Status status = NewSession(SessionOptions(), &session);
-    std::string graph_filename="/home/allen/linux/car_line/model/model_0415.pb";
+    std::string graph_filename="/home/allen/linux/catkin_ws/model_0415.pb";
     LoadGraph(graph_filename, &session);
 
 //    std::string timepath="/home/nvidia/testSD/tensorflow_model/time.txt";
@@ -49,34 +167,46 @@ int main(int argc, char *argv[])
 
     cvConDensInitSampleSet(condens, &lowerBound, &upperBound);
 
+    // VideoCapture capture(0);
+    // rosbag play -l 2019-05-07-17-18-56.bag --topic /usb_cam/image_raw 
 
-
-	ros::Rate loop_rate(10);
+	ros::Rate loop_rate(30);
     while(ros::ok()){
-        ros::spinOnce();
+
         clockid_t start_time, end_time;
         float total_time=0;
         start_time=clock();
 
-        // capture>>frame;
-        while(frame.empty()){
-            ros::spinOnce();}
-
+        capture>>frame;
+        ///////////////////////////
+        //         ros::spinOnce();
+        // while(frame.empty()){
+        //     ros::spinOnce();}
+////////////////////////////////////
 
         if(frame.empty()){
 //            fd.close();
             break;
         }
-
-
-
-
+        // float k=479;float h=100;
+        // float aa;float cc;
+        // settingmap(k,h,aa,cc);printf("map_x=%f,map_y=%f",aa,cc);
+        
         resize(frame,frame_resize,cv::Size(512,288),CV_INTER_LINEAR);
-
-
-cvtColor(frame_resize,frame_resize_gray,CV_BGR2GRAY);//w
-
-
+        Mat newing(288,1024, CV_8UC3, Scalar(0,0,0));
+        frame_new=newing;
+        for(int i=0;i<frame_resize.rows;i++)
+        {
+            for(int j=0;j<frame_resize.cols;j++)
+            {
+                //newing.create(288,1024, CV_8UC3);
+                int x=i;
+                int y=j+frame_resize.cols/2;
+                    newing.at<Vec3b>(x,y)[0]=frame_resize.at<Vec3b>(i,j)[0];
+                    newing.at<Vec3b>(x,y)[1]=frame_resize.at<Vec3b>(i,j)[1];
+                    newing.at<Vec3b>(x,y)[2]=frame_resize.at<Vec3b>(i,j)[2];
+            }
+        }
         count1++;
 
         if (predict_hy) {
@@ -121,7 +251,11 @@ cvtColor(frame_resize,frame_resize_gray,CV_BGR2GRAY);//w
                 Condensationtracking();
             }
             else{
-
+                vision_pro::line_inform line_msg;
+                line_msg.state=3;
+                // vector<float> lane_lx;
+                // line_msg.line1_x=lane_lx;
+                pub1.publish(line_msg);
                 Mat Roi=frame_resize(cv::Rect(0,160,512,128)).clone();
                 Mat Roi_size = frame_resize(cv::Rect(0,160,512,128));
 
@@ -137,20 +271,44 @@ cvtColor(frame_resize,frame_resize_gray,CV_BGR2GRAY);//w
                 // imshow("Roi_size",Roi_size);
             }
         }
-        Mat app;
-        resize(frame_resize,frame_resize,cv::Size(img_w,img_h),CV_INTER_LINEAR);
-        app=worldcoordinate(frame_resize);
-        imshow("capture",frame_resize);
-        imshow("capture1",app);
-        frame_resize.release();
+
+        ////////////////////////////sssssssssssss
+        cv::Mat show_data;
+        show_data= newing(Range(0,287), Range(256,767));
+        resize(show_data,show_data,cv::Size(128,72),CV_INTER_LINEAR);
+        vision::image_cv pic_source;
+		pic_source.weight=show_data.cols;//x
+		pic_source.hight=show_data.rows;//y
+		std_msgs::Int32MultiArray array;
+		array.data.clear();
+		pic_source.data.clear();
+		 for(int i=0;i<show_data.rows;i++)
+		 		for(int j=0;j<show_data.cols;j++)
+				 		for(int k=0;k<3;k++){
+		array.data.push_back(show_data.data[(i*show_data.cols*3)+(j*3)+k]);
+				 }
+		pic_source.data=array.data;
+		pub2.publish(pic_source);
+        /////////////////////////////////////ssssssssss
+        //Mat app;
+        // resize(frame_resize,frame_resize,cv::Size(img_w,img_h),CV_INTER_LINEAR);
+        // app=worldcoordinate(frame_resize);
+        // imshow("frame",frame);
+        // imshow("capture",frame_resize);
+        imshow("capture1",newing);
+        // frame_resize.release();
         //imwrite("capture.png",frame_resize);
         //imwrite("capture2.png",img_1);
+
         waitKey(1);
 
 
-        end_time=clock();
+        //end_time=clock();
         total_time=(float)(end_time-start_time)/CLOCKS_PER_SEC;
+        printf("Time : %f sec \n", total_time);
 
+
+        //fd<<fixed<<total_time<<"\r\n";
 loop_rate.sleep();
 
     }
@@ -311,7 +469,7 @@ void gradient() {
         }
     }
 
-    //imshow("edge_img", edge_img);
+    // imshow("edge_img", edge_img);
     //imwrite("edge_img.png",edge_img);
     int g, k = 0;
     for (uint16_t f = 0; f < 90; f++) {
@@ -622,8 +780,8 @@ void ROI_II_feature() {
         ROI_II = searchfeaturepoint(ROI, ROI_II, direction_angle[0]);
         ROI_II = searchfeaturepoint(ROI, ROI_II, direction_angle[1]);
 
-        //imshow("ROI_II", ROI_II);
-        //imshow("ROI", ROI);
+        // imshow("ROI_II", ROI_II);
+        // imshow("ROI", ROI);
         //imwrite("ROI_II.png",ROI_II);
         //imwrite("ROI.png", ROI);
     }
@@ -995,27 +1153,31 @@ void Condensationtracking() {
 
     //Lineim=Mat::zeros(frame_resize.rows,frame_resize.cols,frame_resize.type());
     //img_1=Mat::zeros(frame_resize.rows,frame_resize.cols,frame_resize.type());
-    
-    Mat black(img_H,img_W, CV_8UC3, Scalar(0, 0, 0));
+    Mat tracking_black(img_H,img_W*2, CV_8UC3, Scalar(0,0,0));
+    Mat img;
 
-  if (vh > 0) {
+    
+    if (vh > 0) {
         for (int k = img_H-1; k > drawheight /*vh + 10*/; k--) {
             float upil = uh + al * (k - vh) + b / (k - vh);
             float upir = uh + ar * (k - vh) + b / (k - vh);
-            hyperbolas_l.push_back(cv::Point2f(upil, k));
-            hyperbolas_r.push_back(cv::Point2f(upir, k));
+            hyperbolas_l.push_back(cv::Point2f(upil+img_W/2, k));
+            hyperbolas_r.push_back(cv::Point2f(upir+img_W/2, k));
         }
         if (!hyperbolas_l.empty()) {
-            drawline(hyperbolas_l, &frame_resize, Scalar(0, 100, 255));
-            drawline(hyperbolas_l, &black, Scalar(0, 0, 255));
+            //drawline(hyperbolas_l, &frame_resize, Scalar(0, 100, 255));
+            drawline(hyperbolas_l, &frame_new, Scalar(0, 100, 255));
+            drawline(hyperbolas_l, &tracking_black, Scalar(0, 0, 255));
             //drawline(hyperbolas_l, &binary_img, Scalar(0, 100, 255));
             //drawline(hyperbolas_l, &Lineim, Scalar(0, 100, 255));
             //drawline(hyperbolas_l, &img_1, Scalar(0, 100, 255));
         }
 
         if (!hyperbolas_r.empty()) {
-            drawline(hyperbolas_r, &frame_resize, Scalar(101, 0, 255));
-            drawline(hyperbolas_r, &black, Scalar(0, 255, 0));
+            //drawline(hyperbolas_r, &frame_resize, Scalar(101, 0, 255));
+            drawline(hyperbolas_r, &frame_new, Scalar(101, 0, 255));
+            drawline(hyperbolas_r, &tracking_black, Scalar(0, 255, 0));
+            //drawline(hyperbolas_r, &binary_img, Scalar(101, 0, 255));
             //drawline(hyperbolas_r, &Lineim, Scalar(101, 0, 255));
             //drawline(hyperbolas_r, &img_1, Scalar(0, 100, 255));
         }
@@ -1025,57 +1187,300 @@ void Condensationtracking() {
     }else{
         predict_hy = false;
     }
-
-    frame_black_widow = black;
+    frame_black_widow = tracking_black;
     cvtColor(frame_black_widow,img,CV_BGR2GRAY);
-    GaussianBlur(frame_resize_gray,frame_resize_gray,Size(5,5),0,0);
-    Mat dst1,dst2;
-    Canny(frame_resize_gray,dst1,50,150,3);
-    threshold(dst1,dst2,128,255,THRESH_BINARY_INV);
-
-
-    int val,thr;
+    int val=0;
     int line1=0;
     int line2=0;
-    int car=0;
-    for(int height=0;height<img.rows;height++){
+    int mid=0;
 
-        for(int width=0;width<img.cols;width++){
+    for(int height=0;height<img.rows;height++)
+    {
+        for(int width=0;width<img.cols;width++)
+        {
             val=img.at<uchar>(height,width);
-            thr=dst1.at<uchar>(height,width);
-            //printf("%d  ",val);
             if(val==76){
                 line1=width;
             }
             if(val==150){
                 line2=width;
-            }
-            if(width>line1+10&&width<line2-10){
-                if(thr==255){
-                    car=height;
-                }
+                break;
             }
         }
-        for(int width=line1;width<line2;width++){
+        for(int width=0;width<img.cols;width++)
+        {
+
             if(width>line1&&width<line2){
-                if(height>car&&height<img.rows){
-                img.at<uchar>(height,width)=80;
-//                frame_black_widow.at<Vec3b>(height,width)[0]=216;
-//                frame_black_widow.at<Vec3b>(height,width)[1]=191;
-//                frame_black_widow.at<Vec3b>(height,width)[2]=216;
-                frame_resize.at<Vec3b>(height,width)[0]=255;
-                frame_resize.at<Vec3b>(height,width)[1]=226;
-                frame_resize.at<Vec3b>(height,width)[2]=198;
-                }
+                //if(height>car&&height<img.rows){
+                //img.at<uchar>(height,width)=80;
+                // frame_new.at<Vec3b>(height,width)[0]=255;
+                // frame_new.at<Vec3b>(height,width)[1]=226;
+                // frame_new.at<Vec3b>(height,width)[2]=198;
+                tracking_black.at<Vec3b>(height,width)[0]=255;
+                tracking_black.at<Vec3b>(height,width)[1]=226;
+                tracking_black.at<Vec3b>(height,width)[2]=198;
+                //}
             }
         }
     }
-    imshow("canny_img", dst1);
 
+    for(int height=0;height<img.rows;height++)
+    {
+        for(int width=0;width<img.cols;width++)
+        {
+            val=img.at<uchar>(height,width);
+
+            if(val==76){
+                line1=width;
+            }
+            if(val==150){
+                line2=width;
+                break;
+            }
+        }
+        if (line1 != 0 && line2 != 0)
+        {
+            mid = (line1 + line2) / 2;
+            for (int width = 0; width < img.cols; width++)
+            {
+                if (width > mid-3&&width<mid+1) {
+                    img.at<uchar>(height, width) = 200;
+                    tracking_black.at<Vec3b>(height, width)[0] = 216;
+                    tracking_black.at<Vec3b>(height, width)[1]=191;
+                    tracking_black.at<Vec3b>(height, width)[2]=216;
+                    frame_new.at<Vec3b>(height,width)[0]=216;
+                    frame_new.at<Vec3b>(height,width)[1]=20;
+                    frame_new.at<Vec3b>(height,width)[2]=220;
+                }
+            }
+            line1=0;line2=0;mid=0;
+            //printf("Line1= %d ,Line2 = %d, Mid = %d (height = %d)  \n", line1, line2,mid, height);
+        }
+    }
+    float mid3=0;
+    vision_pro::line_inform line_msg;
+
+    for(int height=287;height<img.rows;height++)
+    {
+        for(int width=0;width<img.cols;width++)
+        {
+            val=img.at<uchar>(height,width);
+            if(val==200){
+                mid3=width;
+            }
+        }
+        // printf("mid=%f\n",mid3);
+        //if(mid3!=0){
+
+            float offest1=mid3;
+            float offest=((mid3-512)/256)*100;
+            // printf("offest1=%f ,offest=%f  \n",offest1,offest);
+       // }
+       if(offest>1&&offest<100){
+          line_msg.state=1;
+       }
+        if(offest<-1&&offest>-100){
+          line_msg.state=2;
+       }
+       if(offest>-1&&offest<1){
+          line_msg.state=0;
+       }
+    line_msg.offest=offest;
+    }
+    
+    
+    line_msg.line1_x.clear();
+    line_msg.line1_y.clear();
+    line_msg.line2_x.clear();
+    line_msg.line2_y.clear();
+    line_msg.mid_x.clear();
+    line_msg.mid_y.clear();
+
+    for(int height=200;height<img.rows;height=height+4)
+    {
+        for(int width=0;width<img.cols;width++)
+        {
+            val=img.at<uchar>(height,width);
+            if(val==76){
+                line1=width;
+            }
+            if(val==150){
+                line2=width;
+                break;
+            }
+            if(val==200){
+                mid3=width;
+            }
+        }
+        float jj=height *480/288;float ii=(line1-256) *640/512;float ii2=(line2-256) *640/512;float mm=(mid3-256) *640/512;
+        
+         float x1;float y_1; float x2; float y2;float mx;float my;
+
+        // printf("Line1= %d ,Line2 = %d,line1_h = %d,Line1_real=%f,Line2_real=%f, line1_h_real = %f ,mm=%f  \n", line1,line2,height, ii,ii2, jj,mm);
+        if( line1 !=0){
+        settingmap(jj,ii,&x1,&y_1);
+        }
+        if( line2 !=0){
+        settingmap(jj,ii2,&x2,&y2);
+        }
+        if( mid3 !=0){
+        settingmap(jj,mm,&mx,&my);
+        }
+        if(x1==0&&y1==0){
+            line_msg.state=3;
+        }
+        if(y_1-y2<80){
+            y_1=y2-275;
+            my=(y_1+y2)/2;
+        }
+        // if(y_1-y2>475){
+        //     y_1=y2+275;
+        //     my=(y_1+y2)/2;
+        // }
+
+        lane_lx.push_back(x1);
+    
+    
+    line_msg.line1_x.push_back(x1);
+    line_msg.line1_y.push_back(y_1);
+    line_msg.line2_x.push_back(x2);
+    line_msg.line2_y.push_back(y2);
+    line_msg.mid_x.push_back(mx);
+    line_msg.mid_y.push_back(my);
+    line_msg.dot_num=line_msg.line1_x.size();
+    
+    
+    }
+
+    
+    int world_x=120; int world_y=800;
+    Mat ipm_img=Mat::zeros(cv::Size(world_x,world_y), CV_8U);
+    Mat ipm_img2=Mat::zeros(cv::Size(world_x,world_y), CV_8UC3);
+    int angle=2;  int height=15.7; int Kx=640; int Ky=480;
+    for (uint16_t i = 0; i < ipm_img.rows; i++)
+    {
+        uchar* ipm_data = ipm_img.ptr<uchar>(i);
+        for (uint16_t j = 10; j < ipm_img.cols; j++)
+        {
+            float xx = 1024 / 2 + Kx * (j - world_x/2) / ((world_y - i)*cos(angle*M_PI / 180) + height * sin(angle * M_PI / 180));
+            float yy = 288 / 2 - Ky * ((world_y - i)*sin(angle * M_PI / 180) - height * cos(angle * M_PI / 180)) / ((world_y - i)*cos(angle * M_PI / 180) - height * sin(angle * M_PI / 180));
+            if (xx > 0 && xx < 1024 && yy>0 && yy < 288)
+            {
+                ipm_data[j] = img.at<uchar>(yy, xx);
+            }
+         }
+     }
+     for (uint16_t i = 0; i < ipm_img.rows; i++)
+    {
+        uchar* ipm_data2 = ipm_img2.ptr<uchar>(i);
+        for (uint16_t j = 0; j < ipm_img.cols; j++)
+        {
+            float xx = 512 / 2 + Kx * (j - ipm_img.cols/2) / ((ipm_img.rows - i)*cos(angle*M_PI / 180) + height * sin(angle * M_PI / 180));
+            float yy = 288 / 2 - Ky * ((ipm_img.rows - i)*sin(angle * M_PI / 180) - height * cos(angle * M_PI / 180)) / ((ipm_img.rows - i)*cos(angle * M_PI / 180) - height * sin(angle * M_PI / 180));
+            if (xx > 0 && xx < 512 && yy>0 && yy < 288)
+            {
+                ipm_data2[j * 3 + 0] = frame_resize.at<Vec3b>(yy, xx)[0];
+                ipm_data2[j * 3 + 1] = frame_resize.at<Vec3b>(yy, xx)[1];
+                ipm_data2[j * 3 + 2] = frame_resize.at<Vec3b>(yy, xx)[2];
+            }
+         }
+     }
+    cv::vector<cv::Point2f>mid2;
+        
+    cv::vector<cv::Point2f>mid_ang;
+    double cur[3]={};
+    for(int i=0;i<ipm_img.rows;i++){
+        for(int j=0;j<ipm_img.cols;j++){
+            val=ipm_img.at<uchar>(i,j);
+            if(val==200){
+                mid2.push_back(cv::Point2f(j,i));
+            }
+        }
+    }
+    for(int i=400;i<ipm_img.rows;i++){
+        for(int j=0;j<ipm_img.cols;j++){
+            val=ipm_img.at<uchar>(i,j);
+            if(val==200){
+                mid_ang.push_back(cv::Point2f(j,i));
+            }
+        }
+    }
+    line_msg.curve.clear();
+    fittingCurve(mid2,3,cur);
+    for(int j=10;j<70;j++){
+    float Rcurve=pow(1+pow(2*cur[2]*j+cur[1],2),3/2)/abs(2*cur[2]);
+    // if(__finite(Rcurve)){
+    //     if(Rcurve>1000){
+    //         printf("曲率=straight,j=%d \n",j);
+    //     }
+    //     else{
+    //         printf("曲率=%f ,j=%d \n",Rcurve,j);
+    //     }
+    // }
+    if(Rcurve>=1000){
+    line_msg.curve.push_back(1000);
+    }
+    if(Rcurve<1000){
+    line_msg.curve.push_back(Rcurve);
+    }
+    }
+    
+
+    double ang[2]={};
+    fittingCurve(mid_ang,2,ang);
+    double car_angle=atan(1/ang[1])*180/M_PI;
+    // printf("車頭角=%f \n",car_angle);
+    line_msg.head_angle=car_angle;
+    if(car_angle=0){
+        line_msg.state=4;
+    }
+    
+
+    float mid_ang1;float mid_ang2;
+    
+    for(int width=0;width<img.cols;width++)
+    {
+      val=img.at<uchar>(200,width);
+        if(val==200){
+            mid_ang1=width;
+        }
+    }
+    for(int width=0;width<img.cols;width++)
+    {
+      val=img.at<uchar>(287,width);
+        if(val==200){
+            mid_ang2=width;
+        }
+    }
+    float mid_angx1;float mid_angy1;
+    // float jj=height *480/288;float ii=(line1-256) *640/512;
+    settingmap(200*480/288,(mid_ang1-256) *640/512,&mid_angx1,&mid_angy1);
+    // printf("num1=%f,num=%f\n",mid_angx1,mid_angy1);
+    float mid_angx2;float mid_angy2;
+    settingmap(287*480/288,(mid_ang2-256) *640/512,&mid_angx2,&mid_angy2);
+    // printf("num1=%f,num=%f\n",mid_angx2,mid_angy2);
+    float ang_re=atan((mid_angy1-mid_angy2)/abs(mid_angx1-mid_angx2))*180/M_PI;
+    // printf("ang_re=%f",ang_re);
+    line_msg.angle_re=ang_re;
+std::reverse(line_msg.line2_x.begin(),line_msg.line2_x.end());
+std::reverse(line_msg.line2_y.begin(),line_msg.line2_y.end());
+std::reverse(line_msg.line1_x.begin(),line_msg.line1_x.end());
+std::reverse(line_msg.line1_y.begin(),line_msg.line1_y.end());
+std::reverse(line_msg.mid_x.begin(),line_msg.mid_x.end());
+std::reverse(line_msg.mid_y.begin(),line_msg.mid_y.end());
+std::reverse(line_msg.curve.begin(),line_msg.curve.end());
+    pub1.publish(line_msg);
+
+
+    // imshow("black",tracking_black);
+    // imshow("world_gray", ipm_img);
+    // imshow("gray", img);
+    // imshow("frame_world", ipm_img2);
 
     hyperbolas_r.clear();
     hyperbolas_l.clear();
 }
+
 
 VP find_intersection(std::vector<cv::Point2f> l1, std::vector<cv::Point2f> l2)
 {
@@ -1332,6 +1737,8 @@ void drawline(vector<cv::Point2f> point, Mat* img, Scalar color) {
         line(*img, point[itt_], point[itt_ + 1], color, 2, CV_AA);
     }
 }
+
+
 
 bool fittingCurve(vector<Point2f> &vec, int times, double *p)
 {

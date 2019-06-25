@@ -12,6 +12,11 @@
 #include <opencv2/gpu/gpu.hpp>
 #include <opencv2/core/internal.hpp>
 #include <iostream>
+
+
+
+#include "vision_pro/line_inform.h"
+
 using namespace std;
 
 cv::Mat Main_frame;

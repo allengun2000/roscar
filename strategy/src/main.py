@@ -152,5 +152,5 @@ def eval_():
 if ON_TRAIN:
     train()
 else:
-    ros_robot()
-    # eval_()
+    # ros_robot()
+    eval_()

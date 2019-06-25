@@ -28,6 +28,8 @@
 #include <sstream>
 #include <math.h>
 #include <cmath> 
+#include "std_msgs/Int32MultiArray.h"
+#include "vision_pro/line_inform.h"
 
 
 
@@ -38,13 +40,10 @@ using namespace cv::gpu;
 cv::Mat Main_frame;
 cv::Mat img_1;
 cv::Mat img_;
-
-cv::Mat frame_black_widow;
-cv::Mat img;
-cv::Mat frame_resize_gray;
-
 cv::Mat frame;
 cv::Mat frame_resize;
+cv::Mat frame_new;
+cv::Mat frame_black_widow;
 cv::Mat learning_img;
 Session* session;
 int height=84;
@@ -121,35 +120,37 @@ void anglecompute();
 
 int img_h;
 int img_w;
-int world_x = 60;
-int world_y = 800;
+int world_x = 150;
+int world_y = 1200;
 float heigh = 13.5;
 float angle = 2.5;
-int Kx = 1650;
-int Ky = 1650;
+int Kx = 1000;
+int Ky = 900;
+std::vector<float> lane_lx;
+ros::Publisher pub1;
+ros::Publisher pub2;
 
+// cv::Mat worldcoordinate(cv::Mat img_world){
+// int xsize = 1024;
+// int ysize = 288;
 
-cv::Mat worldcoordinate(cv::Mat img){
-int xsize = img_w;
-int ysize = img_h;
-
-	Mat ipm_img = Mat::zeros(cv::Size(world_x, world_y), CV_8UC3);
+// 	Mat ipm_img = Mat::zeros(cv::Size(world_x, world_y), CV_8UC3);
 	
-	for (uint16_t i = 0; i < world_y; i++) {
-		uchar* ipm_data = ipm_img.ptr<uchar>(i);
-		for (uint16_t j = 0; j < world_x; j++) {
-			float xx = xsize / 2 + Kx * (j - (world_x / 2)) / ((world_y - i)*cos(angle*M_PI / 180) + heigh * sin(angle * M_PI / 180));
-			float yy = ysize / 2 - Ky * ((world_y - i)*sin(angle * M_PI / 180) - heigh * cos(angle * M_PI / 180)) / ((world_y - i)*cos(angle * M_PI / 180) - heigh * sin(angle * M_PI / 180));
-			if (xx > 0 && xx < xsize && yy>0 && yy < ysize) {
-				ipm_data[j * 3 + 0] = img.at<Vec3b>(yy, xx)[0];
-				ipm_data[j * 3 + 1] = img.at<Vec3b>(yy, xx)[1];
-				ipm_data[j * 3 + 2] = img.at<Vec3b>(yy, xx)[2];
-			}
-		}
-	}
+// 	for (uint16_t i = 0; i < world_y; i++) {
+// 		uchar* ipm_data = ipm_img.ptr<uchar>(i);
+// 		for (uint16_t j = 0; j < world_x; j++) {
+// 			float xx = xsize / 2 + Kx * (j - (world_x / 2)) / ((world_y - i)*cos(angle*M_PI / 180) + heigh * sin(angle * M_PI / 180));
+// 			float yy = ysize / 2 - Ky * ((world_y - i)*sin(angle * M_PI / 180) - heigh * cos(angle * M_PI / 180)) / ((world_y - i)*cos(angle * M_PI / 180) - heigh * sin(angle * M_PI / 180));
+// 			if (xx > 0 && xx < xsize && yy>0 && yy < ysize) {
+// 				ipm_data[j * 3 + 0] = img_world.at<Vec3b>(yy, xx)[0];
+// 				ipm_data[j * 3 + 1] = img_world.at<Vec3b>(yy, xx)[1];
+// 				ipm_data[j * 3 + 2] = img_world.at<Vec3b>(yy, xx)[2];
+// 			}
+// 		}
+// 	}
 
-	return ipm_img;
-}
+// 	return ipm_img;
+// }
 void ParmIsChangeCallback(const std_msgs::Bool::ConstPtr& msg)
 {
 	ros::NodeHandle n;

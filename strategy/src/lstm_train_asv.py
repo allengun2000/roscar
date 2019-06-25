@@ -25,7 +25,7 @@ OUTPUT_SIZE = 2
 CELL_SIZE = 500
 LR = 0.006
 ON_TRAIN=True
-ON_TRAIN=False
+# ON_TRAIN=False
 
 
 

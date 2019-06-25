@@ -8,7 +8,7 @@ project(matlab_strage)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  message_generation roscpp rospy std_msgs)
+  message_generation roscpp rospy std_msgs vision_pro)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -127,7 +127,7 @@ include/matlab_strage/angleUtilities.cpp
 include_directories(
   include ${catkin_INCLUDE_DIRS}
   include/matlab_strage
-  /usr/local/MATLAB/R2019a/extern/include
+  # /usr/local/MATLAB/R2019a/extern/include
 # include
 # ${catkin_INCLUDE_DIRS}
 )
@@ -215,7 +215,7 @@ add_executable(later_control
   src/later_control.cpp
   ${ic_source}
 )
-add_dependencies(later_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(later_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} vision_pro_generate_messages_cpp)
 target_link_libraries(later_control
   ${catkin_LIBRARIES}
 )

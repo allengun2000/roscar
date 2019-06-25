@@ -483,6 +483,7 @@ CMakeFiles/interface.dir/include/interface/qcustomplot.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidgetaction.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwizard.h
 CMakeFiles/interface.dir/interface_automoc.cpp.o
+ /home/allen/linux/catkin_ws/devel/include/vision_pro/line_inform.h
  /home/allen/linux/catkin_ws/src/interface-build/interface_automoc.cpp
  /home/allen/linux/catkin_ws/src/interface-build/moc_mainwindow.cpp
  /home/allen/linux/catkin_ws/src/interface-build/moc_qcustomplot.cpp
@@ -693,7 +694,9 @@ CMakeFiles/interface.dir/interface_automoc.cpp.o
  /opt/ros/kinetic/include/sensor_msgs/Image.h
  /opt/ros/kinetic/include/sensor_msgs/RegionOfInterest.h
  /opt/ros/kinetic/include/sensor_msgs/image_encodings.h
+ /opt/ros/kinetic/include/std_msgs/Bool.h
  /opt/ros/kinetic/include/std_msgs/Float32.h
+ /opt/ros/kinetic/include/std_msgs/Float64.h
  /opt/ros/kinetic/include/std_msgs/Header.h
  /opt/ros/kinetic/include/std_msgs/String.h
  /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h
@@ -1179,6 +1182,7 @@ CMakeFiles/interface.dir/interface_automoc.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidgetaction.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwizard.h
 CMakeFiles/interface.dir/src/main.cpp.o
+ /home/allen/linux/catkin_ws/devel/include/vision_pro/line_inform.h
  /home/allen/linux/catkin_ws/src/interface/include/interface/qcustomplot.h
  /home/allen/linux/catkin_ws/src/interface/src/main.cpp
  /home/allen/linux/catkin_ws/src/interface/src/mainwindow.h
@@ -1387,7 +1391,9 @@ CMakeFiles/interface.dir/src/main.cpp.o
  /opt/ros/kinetic/include/sensor_msgs/Image.h
  /opt/ros/kinetic/include/sensor_msgs/RegionOfInterest.h
  /opt/ros/kinetic/include/sensor_msgs/image_encodings.h
+ /opt/ros/kinetic/include/std_msgs/Bool.h
  /opt/ros/kinetic/include/std_msgs/Float32.h
+ /opt/ros/kinetic/include/std_msgs/Float64.h
  /opt/ros/kinetic/include/std_msgs/Header.h
  /opt/ros/kinetic/include/std_msgs/String.h
  /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h
@@ -1874,6 +1880,7 @@ CMakeFiles/interface.dir/src/main.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidgetaction.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwizard.h
 CMakeFiles/interface.dir/src/mainwindow.cpp.o
+ /home/allen/linux/catkin_ws/devel/include/vision_pro/line_inform.h
  /home/allen/linux/catkin_ws/src/interface/include/interface/qcustomplot.h
  /home/allen/linux/catkin_ws/src/interface/src/mainwindow.cpp
  /home/allen/linux/catkin_ws/src/interface/src/mainwindow.h
@@ -2082,7 +2089,9 @@ CMakeFiles/interface.dir/src/mainwindow.cpp.o
  /opt/ros/kinetic/include/sensor_msgs/Image.h
  /opt/ros/kinetic/include/sensor_msgs/RegionOfInterest.h
  /opt/ros/kinetic/include/sensor_msgs/image_encodings.h
+ /opt/ros/kinetic/include/std_msgs/Bool.h
  /opt/ros/kinetic/include/std_msgs/Float32.h
+ /opt/ros/kinetic/include/std_msgs/Float64.h
  /opt/ros/kinetic/include/std_msgs/Header.h
  /opt/ros/kinetic/include/std_msgs/String.h
  /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h
@@ -2094,6 +2103,7 @@ CMakeFiles/interface.dir/src/mainwindow.cpp.o
  /usr/include/qwt/qwt_global.h
  /usr/include/qwt/qwt_interval.h
  /usr/include/qwt/qwt_scale_div.h
+ /usr/include/qwt/qwt_slider.h
  /usr/include/qwt/qwt_text.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QCache
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QDateTime
@@ -2454,6 +2464,7 @@ CMakeFiles/interface.dir/src/mainwindow.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QPushButton
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QScrollerProperties
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStatusBar
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTabWidget
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QToolBar
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QtWidgets

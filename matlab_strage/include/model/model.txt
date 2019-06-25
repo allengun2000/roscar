@@ -1,0 +1,11 @@
+  def _build_a(self, s, reuse=None, custom_getter=None):
+        trainable = True if reuse is None else False
+        with tf.variable_scope('Actor', reuse=reuse, custom_getter=custom_getter):
+            net = tf.layers.dense(s, 20, activation=tf.nn.relu, name='l1', trainable=trainable)
+            net = tf.layers.dense(net, 200, activation=tf.nn.relu, name='l2', trainable=trainable)
+            tf.layers.dropout(net,rate=0.2,noise_shape=None,seed=None,training=trainable,name='drop')
+            net = tf.layers.dense(net, 20, activation=tf.nn.relu, name='l3', trainable=trainable)
+            # net = tf.layers.dense(net, 500, activation=tf.nn.relu, name='l3', trainable=trainable)
+            # net = tf.layers.dense(net, 500, activation=tf.nn.relu, name='l4', trainable=trainable)
+            a = tf.layers.dense(net, self.a_dim, activation=tf.nn.tanh, name='a', trainable=trainable)
+            return tf.multiply(a, self.a_bound, name='scaled_a')

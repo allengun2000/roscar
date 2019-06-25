@@ -10,72 +10,22 @@
 #include "later_car.h"
 #include "later_car_terminate.h"
 #include "later_car_initialize.h"
+#include "iostream"
+#include "vision_pro/line_inform.h"
+#include "geometry_msgs/Pose2D.h"
+using namespace std;
+///function steerCmd = later_car(refPose, currPose, currVelocity, direction ,gain ,wheelbase,maxSteer)
+// rosrun usb_cam usb_cam_node _video_device:=/dev/video0
 
-/* Function Declarations */
-static void argInit_1x3_real_T(double result[3]);
-static boolean_T argInit_boolean_T();
-static double argInit_real_T();
-static void main_later_car();
-
-/* Function Definitions */
-static void argInit_1x3_real_T(double result[3])
-{
-  double result_tmp;
-
-  /* Loop over the array to initialize each element. */
-  /* Set the value of the array element.
-     Change this value to the value that the application requires. */
-  result_tmp = argInit_real_T();
-  result[0] = result_tmp;
-
-  /* Set the value of the array element.
-     Change this value to the value that the application requires. */
-  result[1] = result_tmp;
-
-  /* Set the value of the array element.
-     Change this value to the value that the application requires. */
-  result[2] = argInit_real_T();
-}
-
-static boolean_T argInit_boolean_T()
-{
-  return false;
-}
-
-static double argInit_real_T()
-{
-  return 0.0;
-}
-
-static void main_later_car()
-{
-  double refPose_tmp[3];
-  double b_refPose_tmp[3];
-  double c_refPose_tmp[3];
-  double steerCmd;
-
-  /* Initialize function 'later_car' input arguments. */
-  /* Initialize function input argument 'refPose'. */
-  argInit_1x3_real_T(refPose_tmp);
-
-  /* Initialize function input argument 'currPose'. */
-  /* Call the entry-point 'later_car'. */
-  b_refPose_tmp[0] = refPose_tmp[0];
-  c_refPose_tmp[0] = refPose_tmp[0];
-  b_refPose_tmp[1] = refPose_tmp[1];
-  c_refPose_tmp[1] = refPose_tmp[1];
-  b_refPose_tmp[2] = refPose_tmp[2];
-  c_refPose_tmp[2] = refPose_tmp[2];
-  steerCmd = later_car(b_refPose_tmp, c_refPose_tmp, argInit_real_T(),
-                       argInit_boolean_T(), argInit_real_T(), argInit_real_T(),
-                       argInit_real_T());
-}
-/**
- * This tutorial demonstrates simple sending of messages over the ROS system.
- */
- void chatterCallback(const std_msgs::String::ConstPtr& msg)
-{
-	ROS_INFO("I heard: [%s]", msg->data.c_str());
+  double refPose[3]={0,0,0};
+  double headangle=0;
+  int state=0;
+void line_callback(const vision_pro::line_inform::ConstPtr& msg)
+{state=msg->state;
+	if(state!=3){
+refPose[0]=msg->mid_x[msg->dot_num-1]/100;
+refPose[1]=msg->mid_y[msg->dot_num-1]/100;
+headangle=msg->angle_re;}
 }
 int main(int argc, char *argv[])
 {
@@ -84,26 +34,43 @@ int main(int argc, char *argv[])
 
 	ros::NodeHandle n;
 
-	ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
-	ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
-	ros::Rate loop_rate(10);
-
-
-	int count = 0;
+	ros::Publisher cmd_pub = n.advertise<geometry_msgs::Pose2D>("/cmd",1000);
+	ros::Subscriber sub = n.subscribe("/line_info", 1000, line_callback);
+	ros::Rate loop_rate(30);
+  later_car_initialize();
+  bool direction =1;
+  double gain =2.5;
+  double wheelbase =2.15;
+  double maxSteer=27;
+  double currPose[3]={0};
+  double currVelocity=10;
+  geometry_msgs::Pose2D cmd_msg;
 	while (ros::ok())
 	{
-
-  later_car_initialize();
-
-  /* Invoke the entry-point functions.
-     You can call entry-point functions multiple times. */
-  main_later_car();
-
-  /* Terminate the application.
-     You do not need to do this more than one time. */
-  later_car_terminate();
-
-		ros::spinOnce();
+	ros::spinOnce();
+if(state==3){
+	cmd_msg.x=0;
+	cout<<"==baaaaaaaaaaaaaaaadddd============\n";
+	continue;
+}
+refPose[2]=headangle;
+cout<<"REF_xy  "<<refPose[0]<<"  "<<refPose[1]<<"\nheading"<<refPose[2]<<endl;
+if(refPose[1]>0.3){
+	currVelocity=25;
+	cmd_msg.x=3;
+}else if(refPose[1]<-0.3){
+	currVelocity=25;
+	cmd_msg.x=5;
+}else{
+	currVelocity=25;
+	cmd_msg.x=4.5;
+}
+cmd_msg.y=3;
+  double steerCmd = -later_car(refPose, currPose , currVelocity, direction ,gain ,wheelbase,maxSteer );
+  cmd_msg.theta=(steerCmd +40)* (720+ 720)/(40 +40) -720;
+cout<<"wheel_angle"<<steerCmd<<endl<<"steer "<<cmd_msg.theta<<endl;
+cout<<"============================\n";
+cmd_pub.publish(cmd_msg);
 
 		loop_rate.sleep();
 	}

@@ -104,7 +104,7 @@ road(scenario, roadCenters,'Lanes',ls);
 
 %% 
 
-egoCar = vehicle(scenario, 'ClassID', 1);
+egoCar = vehicle(scenario, 'ClassID', 1,'Width', 0.45);
 % trajectory(egoCar, roadCenters(1:end,1:end) , 100); % On right lane
 
 % Add a car in front of the ego vehicle

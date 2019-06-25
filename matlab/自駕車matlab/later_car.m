@@ -1,4 +1,4 @@
-function steerCmd = later_car(refPose, currPose, currVelocity, direction ,gain ,wheelbase,maxSteer)
+function [steerCmd,posError,angError] = later_car(refPose, currPose, currVelocity, direction ,gain ,wheelbase,maxSteer)
 
 
 narginchk(3, 11);

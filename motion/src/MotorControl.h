@@ -58,7 +58,7 @@ int mcssl_init(/*const char *devs*/)
 
      cssl_start();
 
-    serial=cssl_open("/dev/ttyUSB2",mcssl_callback,0,57600,8,0,1);
+    serial=cssl_open("/dev/ttyUSB0",mcssl_callback,0,57600,8,0,1);
 	// serial=cssl_open("/dev/ttyACM0",mcssl_callback,0,57600,8,0,1);
     if (!serial) {
 	printf("%s\n",cssl_geterrormsg());
