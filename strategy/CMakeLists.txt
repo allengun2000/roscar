@@ -9,10 +9,17 @@ project(strategy)
 ## is used, also find other catkin packages
 
 find_package(catkin REQUIRED COMPONENTS
-  message_generation rospy roscpp)
-
+  message_generation rospy roscpp vision_pro)
+add_definitions(-std=c++11 -O3)
+set(CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "${CXX_FLAGS}")
+set(sources src/mpc_control/src/MPC.cpp src/mpc_control/src/main.cpp)
+include_directories(/usr/local/include)
+link_directories(/usr/local/lib)
+include_directories(src/mpc_control/src/Eigen-3.3)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -109,12 +116,26 @@ catkin_package(
 ###########
 ## Build ##
 ###########
-
+set(ic_source
+src/later_control/include/matlab_strage/rtwtypes.h
+src/later_control/include/matlab_strage/later_car_types.h
+src/later_control/include/matlab_strage/rt_nonfinite.h
+src/later_control/include/matlab_strage/later_car.h
+src/later_control/include/matlab_strage/later_car_terminate.h
+src/later_control/include/matlab_strage/later_car_initialize.h
+src/later_control/include/matlab_strage/rt_nonfinite.cpp
+src/later_control/include/matlab_strage/later_car.cpp
+src/later_control/include/matlab_strage/later_car_terminate.cpp
+src/later_control/include/matlab_strage/later_car_initialize.cpp
+src/later_control/include/matlab_strage/angleUtilities.h
+src/later_control/include/matlab_strage/angleUtilities.cpp
+)
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
  include
  ${catkin_INCLUDE_DIRS}
+src/later_control/include/matlab_strage
 )
 
 ## Declare a C++ library
@@ -186,6 +207,17 @@ include_directories(
 ## Testing ##
 #############
 
+add_executable(later_control
+  src/later_control/later_control.cpp
+  ${ic_source}
+)
+add_dependencies(later_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} vision_pro_generate_messages_cpp)
+target_link_libraries(later_control
+  ${catkin_LIBRARIES}
+)
+add_executable(mpc ${sources})
+add_dependencies(mpc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(mpc ${catkin_LIBRARIES} ipopt z ssl uv uWS)
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_strategy.cpp)
 # if(TARGET ${PROJECT_NAME}-test)

@@ -1,9 +1,0 @@
-float64 cur_x
-float64 cur_y
-float64 cur_theta
-float64 ref_x
-float64 ref_y
-float64 ref_theta
-float64 speed
----
-int64 wheel_angle

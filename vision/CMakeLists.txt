@@ -24,6 +24,9 @@ find_package(OpenCV)
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
+if(CMAKE_COMPILER_IS_GNUCXX)
+    add_definitions(-std=gnu++0x)
+endif()
 
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
