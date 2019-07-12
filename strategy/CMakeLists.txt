@@ -9,7 +9,7 @@ project(strategy)
 ## is used, also find other catkin packages
 
 find_package(catkin REQUIRED COMPONENTS
-  message_generation rospy roscpp vision_pro)
+  message_generation rospy roscpp vision_pro )
 add_definitions(-std=c++11 -O3)
 set(CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS "${CXX_FLAGS}")
@@ -57,11 +57,9 @@ add_message_files(FILES
 )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(FILES
+  se.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -218,6 +216,14 @@ target_link_libraries(later_control
 add_executable(mpc ${sources})
 add_dependencies(mpc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(mpc ${catkin_LIBRARIES} ipopt z ssl uv uWS)
+
+add_executable(ipo_test src/mpc_control/src/ipopt_sample.cpp)
+add_dependencies(ipo_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ipo_test ${catkin_LIBRARIES} ipopt)
+
+add_executable(fuzzy src/fuzzycontrol/fuzzy_control.cpp)
+add_dependencies(fuzzy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(fuzzy ${catkin_LIBRARIES})
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_strategy.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
