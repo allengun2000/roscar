@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_definitions(-std=c++11 -O3)
 set(CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS "${CXX_FLAGS}")
-set(sources src/mpc_control/src/MPC.cpp src/mpc_control/src/main.cpp)
+set(sources src/mpc_strategy/src/MPC.cpp src/mpc_strategy/src/main.cpp)
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
 include_directories(src/mpc_control/src/Eigen-3.3)
@@ -217,7 +217,7 @@ add_executable(mpc ${sources})
 add_dependencies(mpc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(mpc ${catkin_LIBRARIES} ipopt z ssl uv uWS)
 
-add_executable(ipo_test src/mpc_control/src/ipopt_sample.cpp)
+add_executable(ipo_test src/mpc_strategy/src/ipopt_sample.cpp)
 add_dependencies(ipo_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ipo_test ${catkin_LIBRARIES} ipopt)
 
