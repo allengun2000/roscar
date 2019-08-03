@@ -231,3 +231,28 @@ target_link_libraries(tf_light
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
+
+add_executable(robot_pointcloud
+  src/robot_pointcloud.cpp
+)
+add_dependencies(robot_pointcloud ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(robot_pointcloud
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
+
+add_executable(pcl_pub
+  src/pcl_pub.cpp
+)
+add_dependencies(pcl_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(pcl_pub
+  ${catkin_LIBRARIES}
+)
+
+add_executable(pcl_sub
+  src/pcl_sub.cpp
+)
+add_dependencies(pcl_sub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(pcl_sub
+  ${catkin_LIBRARIES}
+)

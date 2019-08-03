@@ -15,6 +15,255 @@
 #include <Eigen/Core>
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/segmentation/sac_segmentation.h>
+#include <std_msgs/Float64MultiArray.h>
+using namespace pcl;
+using namespace pcl::io;
+using namespace std;
+using namespace cv;
+using namespace Eigen; 
+typedef pcl::PointXYZ VPoint;
+typedef pcl::PointCloud<VPoint> VPointCloud;
+cv::Mat  Main_frame;
+cv::Mat  image_roi;
+cv::Mat  img;
+Mat1b mask;Mat1b mask2;
+Mat1b red_light,greenlight;
+std::vector<double> HSV;
+ros::Publisher point_pub;
+VPointCloud alln_point_msg;  
+float tfl_x=0,tfl_y=0;  
+
+int world_x = 120;
+int world_y = 1000;
+float heigh =15.7;
+float angle = 2;
+int Kx = 640;
+int Ky = 2000;
+int y_start=99999;
+// rosbag play -s 23 -u 9 -l tf2.bag 
+// rosbag play -s 23 -u 9 --pause -l tf2.bag
+int dis_model[21][2]={{51,276},
+                      {49,271},
+                      {47,269},
+                      {45,268},
+                      {43,266},
+                      {42,260},
+                      {40,258},
+                      {29,230},
+                      {28,227},
+                      {27,223},
+                      {25,211},
+                      {24,207},
+                      {22,195},
+                      {21,187},
+                      {20,178},
+                      {19,173},
+                      {17,158},
+                      {15,131},
+                      {14,108},
+                      {12,75}};
+
+int img_h_roi[2]={200,210};
+void ParmIsChangeCallback(const std_msgs::Bool::ConstPtr& msg)
+{
+	ros::NodeHandle n;
+	if(msg->data){
+	n.getParam("/golf/hsv",HSV);
+  n.getParam("/golf/high",heigh);
+	n.getParam("/golf/angle",angle);
+	n.getParam("/golf/Kx",Kx);
+	n.getParam("/golf/Ky",Ky);
+	n.getParam("/golf/world_x",world_x);
+	n.getParam("/golf/world_y",world_y);
+}else{
+		system("rosparam dump ~/linux/catkin_ws/src/a_launch/config/Parameter.yaml /golf");
+	}
+}
+void Parameter_getting(bool file){
+	ros::NodeHandle n;
+if(file){
+    system("rosparam load ~/linux/catkin_ws/src/a_launch/config/Parameter.yaml /golf");
+	n.getParam("/golf/hsv",HSV);
+    cout<<"read the YAML file"<<endl;
+  }else{
+	system("rosparam dump ~/linux/catkin_ws/src/a_launch/config/Parameter.yaml /golf");
+  }
+}
+void imageCallback(const sensor_msgs::ImageConstPtr& msg)
+{
+  cv_bridge::CvImagePtr cv_ptr;
+  try
+  {
+
+    cv_ptr = cv_bridge::toCvCopy(msg, "bgr8");
+		Main_frame=cv_ptr->image;
+    image_roi=Main_frame;
+  }
+  catch (cv_bridge::Exception& e)
+  {
+    ROS_ERROR("cv_bridge exception: %s", e.what());
+    return;
+  }
+}
+
+void tf_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
+Mat rf_mat=Main_frame.clone();
+  int redcount=0;int greencount=0;
+      Mat hsv;
+		cvtColor(rf_mat, hsv, COLOR_BGR2HSV);
+    inRange(hsv, Scalar(0, 145, 138), Scalar(5, 255, 255), red_light);
+    inRange(hsv, Scalar(42, 145, 69), Scalar(90, 255, 255), greenlight);
+if(msg->data[0]==4){
+    for(int i=0;i<21;i++){
+  if(  msg->data[1]<dis_model[i][0] && msg->data[1]>dis_model[i+1][0]){
+//////////////
+    for(int k=370;k<604;k++){
+    for(int j=dis_model[i+1][1]-10;j<dis_model[i][1]+10;j++){
+        // redcount=(red_light.at<uchar>(i,j)==255)?redcount+1:redcount;
+        if(red_light.at<uchar>(j,k)==255){
+          redcount++;
+          red_light.at<uchar>(j,k)=125;}else{
+            red_light.at<uchar>(j,k)=50;
+          }
+         if(greenlight.at<uchar>(j,k)==255){
+          greencount++;
+          red_light.at<uchar>(j,k)=200;}
+      }
+    }
+    if(redcount>greencount){
+      rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
+    }else if(redcount==0 && greencount==0){
+      rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(255,0,0), 1);
+    }else{
+      rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,255,0), 1);
+    }
+  }
+  }
+      for(int i=0;i<21;i++){
+  if(  msg->data[4]<dis_model[i][0] && msg->data[4]>dis_model[i+1][0]){//////
+    for(int k=185;k<370;k++){
+    for(int j=dis_model[i+1][1]-10;j<dis_model[i][1]+10;j++){
+        if(red_light.at<uchar>(j,k)==255){
+          redcount++;
+          red_light.at<uchar>(j,k)=125;}else{
+            red_light.at<uchar>(j,k)=50;
+          }
+         if(greenlight.at<uchar>(j,k)==255){
+          greencount++;
+          red_light.at<uchar>(j,k)=200;}
+      }
+    }
+    if(redcount>greencount){
+      rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
+    }else if(redcount==0 && greencount==0){
+      rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(255,0,0), 1);
+    }else{
+      rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,255,0), 1);
+    }
+  }
+  }
+}
+if(msg->data[0]==5){
+    for(int i=0;i<21;i++){
+  if(  msg->data[4]<dis_model[i][0] && msg->data[4]>dis_model[i+1][0])
+
+rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
+
+  }
+      for(int i=0;i<21;i++){
+  if(  msg->data[1]<dis_model[i][0] && msg->data[1]>dis_model[i+1][0])
+rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
+  }
+}
+  cv::imshow("line1", rf_mat);
+  cv::imshow("red", red_light);
+}
+int main(int argc, char *argv[])
+{
+	
+	ros::init(argc, argv, "road");
+	ros::NodeHandle n;
+	ros::Rate loop_rate(100);
+    Parameter_getting(1);
+    ros::Subscriber sub_parm = n.subscribe("/ParmIsChange", 10, ParmIsChangeCallback);
+  point_pub = n.advertise<VPointCloud>("allen_point", 1);
+  image_transport::ImageTransport it(n);
+  image_transport::Subscriber sub_image = it.subscribe("/camera452/image_raw", 1, imageCallback);
+	  //  ros::Subscriber velodyne_scan_ = n.subscribe("/points_raw", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
+     ros::Subscriber sub1 = n.subscribe("/Can_I_GO_Ma", 10, tf_callback);
+//   image_transport::Publisher pub_image = it.advertise("camera/image", 1);
+  sensor_msgs::ImagePtr msg_image;
+	int count = 0;
+while (ros::ok())
+	{
+		ros::spinOnce();
+		while(Main_frame.cols<2){
+			ros::spinOnce();
+			if(!ros::ok()){
+				return 1;
+			}
+		}
+		////////////////
+		img=Main_frame.clone();
+		vector<Vec4i> linesP;
+		
+
+
+
+
+    Mat hsv;
+		cvtColor(img, hsv, COLOR_BGR2HSV);
+          if(HSV[1]<HSV[0]){
+    inRange(hsv, Scalar(HSV[1], HSV[3], HSV[5]), Scalar(HSV[0], HSV[2], HSV[4]), mask);}else{
+    inRange(hsv, Scalar(0, HSV[3], HSV[5]), Scalar(HSV[0], HSV[2], HSV[4]), mask);
+    inRange(hsv, Scalar(HSV[1], HSV[3], HSV[5]), Scalar(360, HSV[2], HSV[4]), mask2);
+    mask=mask|mask2;
+    }
+    // inRange(hsv, Scalar(0, 145, 138), Scalar(5, 255, 255), red_light);
+    // inRange(hsv, Scalar(42, 145, 69), Scalar(90, 255, 255), greenlight);
+	// cv::imshow("Images", mask);
+	// 		cv::imshow("red", red_light);
+  //     cv::imshow("green", greenlight);
+		cv::imshow("line", Main_frame);
+      // cv::imshow("line1", image_roi);
+		// Mat worldtodot;red_light
+		// worldtodot= dis_dot(world);
+		// cv::imshow("line", mask);
+		// cv::imshow("word",img);
+   	    cv::waitKey(1);
+		
+		// msg_image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img).toImageMsg();
+		// pub_image.publish(msg_image);
+//////
+
+		// loop_rate.sleep();
+	}
+Main_frame.release();
+img.release();
+	return 0;
+}
+
+
+
+/*
+#include "ros/ros.h"
+#include "vision/image_cv.h"
+#include "std_msgs/Float64MultiArray.h"
+#include "std_msgs/Float32.h"
+#include "std_msgs/Bool.h"
+#include <image_transport/image_transport.h>
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <iostream>
+#include <pcl_ros/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/common/transforms.h>
+#include <Eigen/Dense>
+#include <Eigen/Core>
+#include <pcl/filters/conditional_removal.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <std_msgs/Float64MultiArray.h>
 using namespace pcl;
 using namespace pcl::io;
 using namespace std;
@@ -86,7 +335,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
 
     cv_ptr = cv_bridge::toCvCopy(msg, "bgr8");
 		Main_frame=cv_ptr->image;
-    image_roi=Main_frame;
+    Main_frame.copyTo(image_roi);
   }
   catch (cv_bridge::Exception& e)
   {
@@ -203,11 +452,11 @@ int temp_middle=999999999;
   cout<<alln_point_msg.points[obs_count].x <<"ss  "<<alln_point_msg.points[obs_count].y<<endl;
   if(alln_point_msg.points[obs_count].x<dis_model[0][0] && alln_point_msg.points[obs_count].x>dis_model[13][0]){
 
-  for(int i=0;i<13;i++){
-  if(  alln_point_msg.points[obs_count].x<dis_model[i][0] && alln_point_msg.points[obs_count].x>dis_model[i+1][0])
-rectangle(image_roi, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
-cv::imshow("line1", image_roi);
-  }
+//   for(int i=0;i<13;i++){
+//   if(  alln_point_msg.points[obs_count].x<dis_model[i][0] && alln_point_msg.points[obs_count].x>dis_model[i+1][0])
+// rectangle(image_roi, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
+// cv::imshow("line1", image_roi);
+//   }
   }
     obs_count=1;
 }
@@ -321,7 +570,27 @@ constructGridClouds(pointCloud_filter, npoints, obs_count, empty_count);
 
 }
 
+void tf_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
+cout<<msg->data[0]<<endl;
+Mat rf_mat=image_roi;
+if(msg->data[0]==5){
+  msg->data[1];
+    for(int i=0;i<13;i++){
+  if(  msg->data[1]<dis_model[i][0] && msg->data[1]>dis_model[i+1][0])
+rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
+  }
+}
+if(msg->data[0]==6){
+  msg->data[1];
+    for(int i=0;i<13;i++){
+  if(  msg->data[1]<dis_model[i][0] && msg->data[1]>dis_model[i+1][0])
+rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
+  }
+}
+  cv::imshow("line1", rf_mat);
+// }
 
+}
 int main(int argc, char *argv[])
 {
 	
@@ -338,6 +607,7 @@ int main(int argc, char *argv[])
   image_transport::ImageTransport it(n);
   image_transport::Subscriber sub_image = it.subscribe("/camera452/image_raw", 1, imageCallback);
 	   ros::Subscriber velodyne_scan_ = n.subscribe("/points_raw", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
+     ros::Subscriber sub1 = n.subscribe("/Can_I_GO_Ma", 10, tf_callback);
 //   image_transport::Publisher pub_image = it.advertise("camera/image", 1);
   sensor_msgs::ImagePtr msg_image;
 	int count = 0;
@@ -369,7 +639,8 @@ while (ros::ok())
 
 		// Mat world;
 		
-		// cv::imshow("line", Main_frame);
+		cv::imshow("line", Main_frame);
+      // cv::imshow("line1", image_roi);
 		// Mat worldtodot;
 		// worldtodot= dis_dot(world);
 		// cv::imshow("line", mask);
@@ -386,4 +657,4 @@ while (ros::ok())
 Main_frame.release();
 img.release();
 	return 0;
-}
+}*/

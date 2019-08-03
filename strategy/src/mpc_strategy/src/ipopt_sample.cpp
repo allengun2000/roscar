@@ -4,37 +4,41 @@
 #include "strategy/se.h"
 using namespace std;
 ros::ServiceClient client;
+strategy::se srv;
 using CppAD::AD;
-
     class FG_eval {
     public:
+    std::vector<double> coeffs;
+    FG_eval(std::vector<double> coeffs) { this->coeffs = coeffs; }
         typedef CPPAD_TESTVECTOR( AD<double> ) ADvector;
         void operator()(ADvector& fg, const ADvector& x)
         {   assert( fg.size() == 3 );
             assert( x.size()  == 4 );
             // Fortran style indexing
+            srv.request.a = coeffs[0];
+            srv.request.b = coeffs[1];
+              if (client.call(srv))
+                {
+                ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+                }
             AD<double> x1 = x[0];
             AD<double> x2 = x[1];
             AD<double> x3 = x[2];
             AD<double> x4 = x[3];
+
             // f(x)
             fg[0] = x1 * x4 * (x1 + x2 + x3) + x3;
             // g_1 (x)
-            fg[1] = x1 + x2;
+            if(x[0]<3){
+            fg[1] = x1 + x2;}else{
+            fg[1] = x1 * x2;}
             // g_2 (x)
             fg[2] = x1 * x1 + x2 * x2 + x3 * x3 + x4 * x4;
             //
             return;
         }
     };
-bool add(strategy::se::Request  &req,
-         strategy::se::Response &res)
-{
-  res.sum = req.a + req.b;
-  ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
-  ROS_INFO("sending back response: [%ld]", (long int)res.sum);
-  return true;
-}
+
 
 int main(int argc, char **argv)
 {   bool ok = true;
@@ -44,7 +48,7 @@ int main(int argc, char **argv)
         ros::NodeHandle n;
 
 
-    ros::ServiceClient client = n.serviceClient<strategy::se>("add_two_ints");
+    client = n.serviceClient<strategy::se>("add_two_ints");
     strategy::se srv;
     srv.request.a = 1;
     srv.request.b = 2;
@@ -80,7 +84,9 @@ int main(int argc, char **argv)
     gl[1] = 40.0;     gu[1] = 40.0;
 
     // object that computes objective and constraints
-    FG_eval fg_eval;
+    std::vector<double> ss;
+    ss.resize(2);ss[0]=2;ss[1]=1;
+    FG_eval fg_eval(ss);
 
     // options
     std::string options;
