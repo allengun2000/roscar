@@ -3,6 +3,8 @@
 #include "std_msgs/Float64MultiArray.h"
 #include "std_msgs/Float32.h"
 #include "std_msgs/Bool.h"
+#include "geometry_msgs/PoseArray.h"
+#include "geometry_msgs/Pose.h"
 #include <image_transport/image_transport.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -21,6 +23,8 @@
 #include <pcl/segmentation/conditional_euclidean_clustering.h>
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/search/kdtree.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/tf.h>
 #include <vector>
 #include <ctime>
 #include <pcl/ModelCoefficients.h>
@@ -31,6 +35,8 @@
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/filters/radius_outlier_removal.h>
+#include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/PoseStamped.h>
 using namespace pcl;
 using namespace pcl::io;
 using namespace std;
@@ -43,10 +49,14 @@ cv::Mat  image_roi;
 cv::Mat  img;
 std::vector<double> HSV;
 ros::Publisher point_pub;
+ros::Publisher pose_pub;
+ros::Publisher Trajectory_point_pub;
 VPointCloud alln_point_msg;  
 float tfl_x=0,tfl_y=0;  
 pcl::PointCloud<pcl::PointXYZ>::Ptr back_ground(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+pcl::PointCloud<pcl::PointXYZ>::Ptr id_online(new pcl::PointCloud<pcl::PointXYZ>);
+pcl::PointCloud<pcl::PointXYZ>::Ptr Trajectory_point_msg(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::visualization::CloudViewer viewer("Cloud Viewer");
 int world_x = 120;
 int world_y = 1000;
@@ -55,7 +65,7 @@ float angle = 2;
 int Kx = 640;
 int Ky = 2000;
 int y_start=99999;
-
+int count_img=0;
 
 
 pcl::ConditionAnd<pcl::PointXYZ>::Ptr range_cond(new pcl::ConditionAnd<pcl::PointXYZ>); //濾除 roi以外的點雲
@@ -278,7 +288,7 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
          
   }
   
-
+//  viewer.showCloud(cloud_filtered);
 
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr point_mis (new pcl::PointCloud<pcl::PointXYZ>);
@@ -296,6 +306,7 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
     }
   }
 
+    //  viewer.showCloud(cloud_filtered);
 
   // viewer.showCloud(point_mis);
 
@@ -306,7 +317,6 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
     outrem.setMinNeighborsInRadius(4); //设置查询点的邻域点集数小于2的删除
     // apply filter
     outrem.filter (*cloud_filtered);     //执行条件滤波   在半径为0.8 在此半径内必须要有两个邻居点，此点才会保存
-     viewer.showCloud(cloud_filtered);
 
 
 //////////////////////////////////聚類開始
@@ -315,7 +325,7 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
   tree->setInputCloud (cloud_filtered); //创建点云索引向量，用于存储实际的点云信息
   std::vector<pcl::PointIndices> cluster_indices;
   pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-  ec.setClusterTolerance (0.4); //距離周圍距離 單位m
+  ec.setClusterTolerance (0.2); //距離周圍距離 單位m
   ec.setMinClusterSize (4);//最少點數
   ec.setMaxClusterSize (100);//最大點數
   ec.setSearchMethod (tree);//设置点云的搜索机制
@@ -324,8 +334,10 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
 
   int j = 0;
   pcl::PointCloud<pcl::PointXYZI>::Ptr point_show (new pcl::PointCloud<pcl::PointXYZI>);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr obj_cloud(new pcl::PointCloud<pcl::PointXYZ>);
   for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
   {
+    double x_sum=0,y_sum=0;
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
     //创建新的点云数据集cloud_cluster，将所有当前聚类写入到点云数据集中
     for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit){
@@ -334,18 +346,79 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
       point_color.x=cloud_filtered->points[*pit].x;point_color.y=cloud_filtered->points[*pit].y;point_color.z=cloud_filtered->points[*pit].z;
       point_color.intensity=j;
       point_show->points.push_back(point_color);
+      x_sum+=point_color.x;
+      y_sum+=point_color.y;
       }
+      pcl::PointXYZ point_middle;
+      point_middle.x=x_sum/cloud_cluster->points.size();
+      point_middle.y=y_sum/cloud_cluster->points.size();
+      point_middle.z=0;
+      // cout<<point_middle.y<<"   "<<point_middle.x<<endl;
+      obj_cloud->points.push_back(point_middle);
     cloud_cluster->width = cloud_cluster->points.size ();
     cloud_cluster->height = 1;
     cloud_cluster->is_dense = true;
-
     // std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
     j++;
   }
+  viewer.showCloud(point_show);
+/////////////////////////////////////////////////////obj_cloud middle of obj
+
+
+if(count_img==3){
+pcl::KdTreeFLANN<pcl::PointXYZ> tree_obj; //建構樹木
+tree_obj.setInputCloud(obj_cloud);
+geometry_msgs::PoseArray id_go;
+id_go.header.frame_id="velodyne";
+if(id_online->points.size() && obj_cloud->points.size()){
+  for(int i=0;i<id_online->points.size();i++){
+		int K = 1;                               //设搜索一个点，即：K为1.
+		std::vector<int> pointIdxNKNSearch(K);   //设置一个类似数组的东西，（我对于C++中vector的理解直接把它当成了数组），pointIdxNKNSearch（K）的长度为K，用于存放点索引
+		std::vector<float> pointNKNSquaredDistance(K);//同样一个长度为K的数组pointNKNSquaredDistance，用于存放距离的平方
+// cout<<obj_cloud->points.size()<<endl;
+		if (tree_obj.nearestKSearch(id_online->points[i], K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0)//前面定义了kdtree作为搜索对象，然后就可以用它来调用系统的nearestKSearch函数了，注意后面的参数，分别是上面已经定义好的。
+		{
+			if(pointNKNSquaredDistance[0]<1.5){ //r距離大於1公分
+       geometry_msgs::Pose pose_temp;
+       pose_temp.position.x=obj_cloud->points[pointIdxNKNSearch[0]].x ;
+       pose_temp.position.y=obj_cloud->points[pointIdxNKNSearch[0]].y ;
+       pose_temp.position.z=0;
+       double th=atan((id_online->points[i].y-pose_temp.position.y)/(id_online->points[i].x-pose_temp.position.x));
+       if((id_online->points[i].y-pose_temp.position.y)>0 && (id_online->points[i].x-pose_temp.position.x)>0 ||
+       (id_online->points[i].y-pose_temp.position.y)<0 && (id_online->points[i].x-pose_temp.position.x)>0){
+            th-=M_PI;
+            }
+       geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
+       pose_temp.orientation=odom_quat;
+
+       id_go.poses.push_back(pose_temp);
+      }
+    }
+  }
+  pose_pub.publish(id_go);
+  id_online->points.clear();
+  id_online->points.resize(obj_cloud->points.size());
+  for(int j=0;j<obj_cloud->points.size();j++){
+    id_online->points[j]=obj_cloud->points[j];
+    Trajectory_point_msg->points.push_back(id_online->points[j]);
+    }
+}else if(obj_cloud->points.size()){
+  id_online->points.clear();
+  id_online->points.resize(obj_cloud->points.size());
+  for(int j=0;j<obj_cloud->points.size();j++){
+  id_online->points[j]=obj_cloud->points[j];
+  }
+}
+count_img=0;
+}
+count_img++;
+
+Trajectory_point_msg->header.frame_id ="velodyne";
+Trajectory_point_pub.publish(Trajectory_point_msg);
     // viewer.showCloud(point_show);
-   cout<<"number people"<<j<<endl;
-  point_show->header.frame_id ="velodyne";
-  point_pub.publish(point_show);
+  //  cout<<"number people"<<j<<endcl;
+  obj_cloud->header.frame_id ="velodyne";
+  point_pub.publish(obj_cloud);
 }
 
 
@@ -361,6 +434,8 @@ int main(int argc, char *argv[])
 
 	ros::Rate loop_rate(100);
   point_pub = n.advertise<VPointCloud>("allen_point", 1);
+  Trajectory_point_pub = n.advertise<VPointCloud>("Trajectory_point", 1);
+  pose_pub = n.advertise<geometry_msgs::PoseArray>("pose_point", 1);
   ros::Subscriber velodyne_scan_ = n.subscribe("/velodyne_points", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
 	int count = 0;
 
@@ -382,13 +457,13 @@ int main(int argc, char *argv[])
 
     condrem.setCondition(range_cond);
 
-  pcl::io::loadPCDFile ("/home/allen/logs/pcd_libss.pcd", *back_ground);
+  pcl::io::loadPCDFile ("/home/allen/logs/pcd_libPEO.pcd", *back_ground);
 
     condrem.setInputCloud(back_ground); 
     condrem.filter(*back_ground);
 		kdtree.setInputCloud(back_ground);
 
-  pcl::io::loadPCDFile ("/home/allen/logs/pcd_libPEO.pcd", *cloud);
+  // pcl::io::loadPCDFile ("/home/allen/logs/pcd_libPEO.pcd", *cloud);
  
 while (ros::ok())
 	{

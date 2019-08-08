@@ -9,7 +9,7 @@ project(vision)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   message_generation
-  roscpp cv_bridge image_transport message_runtime sensor_msgs
+  roscpp cv_bridge image_transport message_runtime sensor_msgs nav_msgs tf
     pcl_ros
     geometry_msgs
     pcl_conversions)

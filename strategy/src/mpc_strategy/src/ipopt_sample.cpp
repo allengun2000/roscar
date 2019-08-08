@@ -25,13 +25,13 @@ using CppAD::AD;
             AD<double> x2 = x[1];
             AD<double> x3 = x[2];
             AD<double> x4 = x[3];
-
             // f(x)
             fg[0] = x1 * x4 * (x1 + x2 + x3) + x3;
+
+              fg[0] += CppAD::exp(-x2);
+            
             // g_1 (x)
-            if(x[0]<3){
-            fg[1] = x1 + x2;}else{
-            fg[1] = x1 * x2;}
+            fg[1] = x1 * x2 * x3 * x4;
             // g_2 (x)
             fg[2] = x1 * x1 + x2 * x2 + x3 * x3 + x4 * x4;
             //
@@ -48,19 +48,19 @@ int main(int argc, char **argv)
         ros::NodeHandle n;
 
 
-    client = n.serviceClient<strategy::se>("add_two_ints");
-    strategy::se srv;
-    srv.request.a = 1;
-    srv.request.b = 2;
-  if (client.call(srv))
-  {
-    ROS_INFO("Sum: %ld", (long int)srv.response.sum);
-  }
-  else
-  {
-    ROS_ERROR("Failed to call service add_two_ints");
-    return 1;
-  }
+  //   client = n.serviceClient<strategy::se>("add_two_ints");
+  //   strategy::se srv;
+  //   srv.request.a = 1;
+  //   srv.request.b = 2;
+  // if (client.call(srv))
+  // {
+  //   ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+  // }
+  // else
+  // {
+  //   ROS_ERROR("Failed to call service add_two_ints");
+  //   return 1;
+  // }
 
     // number of independent variables (domain dimension for f and g)
     size_t nx = 4;
