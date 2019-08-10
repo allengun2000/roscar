@@ -4,6 +4,8 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <pcl_ros/point_cloud.h>
+#include <pcl/point_types.h>
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
 #include "MPC.h"
@@ -14,14 +16,18 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "std_msgs/Float32.h"
 #include "geometry_msgs/Pose2D.h"
+
 // for convenience
 using namespace std;
+typedef pcl::PointXYZ VPoint;
+typedef pcl::PointCloud<VPoint> VPointCloud;
 ros::Publisher waypoint_pub;
 geometry_msgs::Point p;
 visualization_msgs::Marker way_point_plot_msg;
 ros::Publisher waypointRef_pub;
 ros::Publisher cmd_pub;
 visualization_msgs::Marker way_pointRef_plot_msg;
+std::vector<double> obs_xy;
           std::vector<double> ptsx;
           std::vector<double> ptsy;
 double px = 0;
@@ -89,6 +95,14 @@ Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals,
   auto result = Q.solve(yvals);
   return result;
 }
+void pointCallback(const VPointCloud::ConstPtr& msg){
+  obs_xy.resize(2*msg->points.size()+1);
+  obs_xy[0]=msg->points.size();
+  for(unsigned i=0;i<msg->points.size();i++){
+    obs_xy[i*2+1]=msg->points[i].x;
+    obs_xy[i*2+2]=msg->points[i].y;
+  }
+}
 void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
   MPC mpc;
           // j[1] is the data JSON object
@@ -134,7 +148,7 @@ void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
           Eigen::VectorXd x0(6);
           x0 << 0, 0, 0, v, cte, epsi;
 
-          auto solution = mpc.Solve(x0, coeffs);
+          auto solution = mpc.Solve(x0, coeffs,obs_xy);
 
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25)] instead of [-1, 1].
@@ -206,18 +220,23 @@ waypointRef_pub = n.advertise<visualization_msgs::Marker>("ref_waypoint_mpc", 0)
   way_point_plot_msg.action =  visualization_msgs::Marker::ADD;
  // marker.pose = msg->pose;
   way_point_plot_msg.scale.x = 0.2;
-  way_point_plot_msg.color.a = 0.5;
+  way_point_plot_msg.color.a = 0.8;
   way_point_plot_msg.color.b = 1.0;
+  way_point_plot_msg.color.g = 1.0;
+  way_point_plot_msg.color.r = 1.0;
 
   way_point_plot_msg.frame_locked =true;
 way_pointRef_plot_msg=way_point_plot_msg;
 way_pointRef_plot_msg.color.g=1.0;
 way_pointRef_plot_msg.color.b=0;
   // waypoint_pub.publish(way_point_plot_msg);
+  obs_xy.resize(1);
+  obs_xy[0]=0;
 //////ros
 	ros::Subscriber sub = n.subscribe("Do_you_like_ice_cream", 10, waypoint_callback);
 	ros::Subscriber sub2 = n.subscribe("/wheelFB", 1000, callback2);
   ros::Subscriber sub3 = n.subscribe("/current_velocity", 1000, callback3);
+  ros::Subscriber velodyne_scan_ = n.subscribe("/allen_point", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
   // uWS::Hub h;
   // MPC is initialized here!
 

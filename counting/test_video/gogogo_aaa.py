@@ -130,7 +130,7 @@ time.sleep(1)
 rospy.init_node('detector_node')
 image_sub = rospy.Subscriber("cam0/image_raw", Image,imcallback)
 
-frame=cv2.imread("/home/allen/1.jpg")
+frame=cv2.imread("/home/allen/1.png")
 
 while not rospy.is_shutdown():
     image_expanded = np.expand_dims(frame, axis=0)
@@ -205,7 +205,7 @@ while not rospy.is_shutdown():
     total_count = density_count + detection_count
 
     text = "Count:"+str(total_count)
-    cv2.putText(frame_, text, (5, 30), cv2.FONT_HERSHEY_PLAIN, 2.0, (0, 0, 255), 2) 
+    cv2.putText(frame_, text, (5, 30), cv2.FONT_HERSHEY_PLAIN, 5.0, (0, 0, 255), 5) 
     # cv2.imwrite('Front.bmp',frame)
     frame_=cv2.resize(frame_,(480,270))
     cv2.imshow('Object detector', frame_)    

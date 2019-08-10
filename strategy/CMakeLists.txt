@@ -9,7 +9,7 @@ project(strategy)
 ## is used, also find other catkin packages
 
 find_package(catkin REQUIRED COMPONENTS
-  message_generation rospy roscpp vision_pro )
+  message_generation rospy roscpp vision_pro pcl_ros)
 add_definitions(-std=c++11 -O3)
 set(CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS "${CXX_FLAGS}")

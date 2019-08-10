@@ -26,7 +26,8 @@ class FG_eval {
  public:
   // Fitted polynomial coefficients
   Eigen::VectorXd coeffs;
-  FG_eval(Eigen::VectorXd coeffs) { this->coeffs = coeffs; }
+  std::vector<double> road_obsPeak;
+  FG_eval(Eigen::VectorXd coeffs ,std::vector<double> road_obsPeak) { this->coeffs = coeffs; this->road_obsPeak = road_obsPeak; }
 
   typedef CPPAD_TESTVECTOR(AD<double>) ADvector;
   void operator()(ADvector& fg, const ADvector& vars) {
@@ -35,7 +36,7 @@ class FG_eval {
     for (int i = 0; i < N; i++) {
       fg[0] += (100 + i * 10) * CppAD::pow(vars[cte_start + i], 2);
       fg[0] += (100 + i * 10) * CppAD::pow(vars[epsi_start + i], 2);
-      fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
+      fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2); 
     }
 
     // Minimize actuator use
@@ -49,9 +50,23 @@ class FG_eval {
       fg[0] += 3000 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i] , 2);
       fg[0] += 10 * CppAD::pow(vars[a_start + i + 1] - vars[a_start + i] , 2);
     }
-    //cte
-    // Setup Constraints
-    //
+    // road can go
+    double car_x=0;
+    double car_y=0;
+    double theta=0;
+    double car_weight=0.5;
+    double car_height=0.5;
+    for (int i = 0; i < N - 1; i++) {
+      for(int j=0 ; j<road_obsPeak[0] ; j++){
+            car_x=road_obsPeak[j*2+1];
+            car_y=road_obsPeak[j*2+2];
+            AD<double> x=vars[x_start + i];
+            AD<double> y=vars[y_start + i];
+            fg[0] += 999999*CppAD::exp(-(((x-car_x)*CppAD::cos(theta)-(y-car_y)*CppAD::sin(theta))/car_weight)*(((x-car_x)*CppAD::cos(theta)-(y-car_y)*CppAD::sin(theta))/car_weight))* 
+        CppAD::exp(-(((y-car_y)*CppAD::cos(theta)+(x-car_x)*CppAD::sin(theta))/car_height)*(((y-car_y)*CppAD::cos(theta)+(x-car_x)*CppAD::sin(theta))/car_height));
+      }
+    }
+    
 
     // Initial state contraints are the same as state0
     fg[1 + x_start] = vars[x_start];
@@ -103,7 +118,7 @@ class FG_eval {
 MPC::MPC() {}
 MPC::~MPC() {}
 
-vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
+vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs ,std::vector<double> road_obsP) {
   bool ok = true;
   size_t i;
   typedef CPPAD_TESTVECTOR(double) Dvector;
@@ -172,8 +187,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   constraints_upperbound[epsi_start] = epsi;
 
 
+
   // object that computes objective and constraints
-  FG_eval fg_eval(coeffs);
+  FG_eval fg_eval(coeffs,road_obsP);
 
   //
   // NOTE: You don't have to worry about these options

@@ -256,3 +256,12 @@ add_dependencies(pcl_sub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_T
 target_link_libraries(pcl_sub
   ${catkin_LIBRARIES}
 )
+
+add_executable(can_drive
+  src/can_drive.cpp
+)
+add_dependencies(can_drive ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(can_drive
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)

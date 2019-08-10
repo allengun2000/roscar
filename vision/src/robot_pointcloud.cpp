@@ -241,56 +241,56 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
 
     // viewer.showCloud(cloud_filtered);
 // //////////////////////找出圓 濾除雜訊
-  pcl::SACSegmentation<pcl::PointXYZ> seg;//创建分割对象
-  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
-  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
-  seg.setOptimizeCoefficients (true);  //设置对估计的模型参数进行优化处理
-  seg.setModelType (pcl::SACMODEL_CIRCLE2D);//设置分割模型类别
-  // seg.setModelType (pcl::SACMODEL_PLANE);
-    // seg.setModelType (pcl::SACMODEL_CYLINDER);
-  seg.setMethodType (pcl::SAC_RANSAC);//设置用哪个随机参数估计方法
+//   pcl::SACSegmentation<pcl::PointXYZ> seg;//创建分割对象
+//   pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+//   pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
+//   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ>);
+//   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
+//   seg.setOptimizeCoefficients (true);  //设置对估计的模型参数进行优化处理
+//   seg.setModelType (pcl::SACMODEL_CIRCLE2D);//设置分割模型类别
+//   // seg.setModelType (pcl::SACMODEL_PLANE);
+//     // seg.setModelType (pcl::SACMODEL_CYLINDER);
+//   seg.setMethodType (pcl::SAC_RANSAC);//设置用哪个随机参数估计方法
   
-  seg.setMaxIterations (100);  //设置最大迭代次数
-  seg.setDistanceThreshold (0.02);    //设置判断是否为模型内点的距离阈值
+//   seg.setMaxIterations (100);  //设置最大迭代次数
+//   seg.setDistanceThreshold (0.02);    //设置判断是否为模型内点的距离阈值
 
-  int i=0, nr_points = (int) cloud_filtered->points.size ();
-  while (cloud_filtered->points.size () > 0.3 * nr_points)
-  {
-    seg.setInputCloud (cloud_filtered);
-    seg.segment (*inliers, *coefficients);
-    if (inliers->indices.size () == 0)
-    {
-      std::cout << "Could not estimate a planar model for the given dataset." << std::endl;
-      return ;
-    }
-    //移去平面局内点，提取剩余点云
-    pcl::ExtractIndices<pcl::PointXYZ> extract;   //创建点云提取对象
-    extract.setInputCloud (cloud_filtered);    //设置输入点云
-    extract.setIndices (inliers);   //设置分割后的内点为需要提取的点集
-    extract.setNegative (false); //设置提取内点而非外点
-    // Get the points associated with the planar surface
-    extract.filter (*cloud_plane);   //提取输出存储到cloud_plane
-    // std::cout << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
-    // Remove the planar inliers, extract the rest
-    extract.setNegative (true);
-    extract.filter (*cloud_f);
-    // *cloud_filtered = *cloud_f;
-//////////////////////////////////////////這裡完成一次跌帶
-/////////////////////////////////////////////把距離小的濾雜訊
-    pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;  //创建滤波器
-    outrem.setInputCloud(cloud_f);    //设置输入点云
-    outrem.setRadiusSearch(0.2);     //设置半径为0.2的范围内找临近点
-    outrem.setMinNeighborsInRadius(4); //设置查询点的邻域点集数小于2的删除
-    // apply filter
-    outrem.filter (*cloud_filtered);     //执行条件滤波   在半径为0.8 在此半径内必须要有两个邻居点，此点才会保存
+//   int i=0, nr_points = (int) cloud_filtered->points.size ();
+//   while (cloud_filtered->points.size () > 0.3 * nr_points)
+//   {
+//     seg.setInputCloud (cloud_filtered);
+//     seg.segment (*inliers, *coefficients);
+//     if (inliers->indices.size () == 0)
+//     {
+//       std::cout << "Could not estimate a planar model for the given dataset." << std::endl;
+//       return ;
+//     }
+//     //移去平面局内点，提取剩余点云
+//     pcl::ExtractIndices<pcl::PointXYZ> extract;   //创建点云提取对象
+//     extract.setInputCloud (cloud_filtered);    //设置输入点云
+//     extract.setIndices (inliers);   //设置分割后的内点为需要提取的点集
+//     extract.setNegative (false); //设置提取内点而非外点
+//     // Get the points associated with the planar surface
+//     extract.filter (*cloud_plane);   //提取输出存储到cloud_plane
+//     // std::cout << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
+//     // Remove the planar inliers, extract the rest
+//     extract.setNegative (true);
+//     extract.filter (*cloud_f);
+//     // *cloud_filtered = *cloud_f;
+// //////////////////////////////////////////這裡完成一次跌帶
+// /////////////////////////////////////////////把距離小的濾雜訊
+//     pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;  //创建滤波器
+//     outrem.setInputCloud(cloud_f);    //设置输入点云
+//     outrem.setRadiusSearch(0.2);     //设置半径为0.2的范围内找临近点
+//     outrem.setMinNeighborsInRadius(4); //设置查询点的邻域点集数小于2的删除
+//     // apply filter
+//     outrem.filter (*cloud_filtered);     //执行条件滤波   在半径为0.8 在此半径内必须要有两个邻居点，此点才会保存
          
-  }
+//   }
   
 //  viewer.showCloud(cloud_filtered);
 
-
+//  viewer.showCloud(cloud_filtered);
   pcl::PointCloud<pcl::PointXYZ>::Ptr point_mis (new pcl::PointCloud<pcl::PointXYZ>);
 ////////////////////////////////////////和背景影像剪
   for(int i=0;i<cloud_filtered->points.size();i++){
@@ -300,32 +300,29 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
  
 		if (kdtree.nearestKSearch(cloud_filtered->points[i], K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0)//前面定义了kdtree作为搜索对象，然后就可以用它来调用系统的nearestKSearch函数了，注意后面的参数，分别是上面已经定义好的。
 		{
-			if(pointNKNSquaredDistance[0]>0.01){ //r距離大於1公分
+			if(pointNKNSquaredDistance[0]>0.1){ //r距離大於1公分
         point_mis->points.push_back(cloud_filtered->points[i]);
       }
     }
   }
 
-    //  viewer.showCloud(cloud_filtered);
 
-  // viewer.showCloud(point_mis);
-
-
+// viewer.showCloud(point_mis);
     pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;  //创建滤波器
     outrem.setInputCloud(point_mis);    //设置输入点云
     outrem.setRadiusSearch(0.2);     //设置半径为0.2的范围内找临近点
-    outrem.setMinNeighborsInRadius(4); //设置查询点的邻域点集数小于2的删除
+    outrem.setMinNeighborsInRadius(2); //设置查询点的邻域点集数小于2的删除
     // apply filter
     outrem.filter (*cloud_filtered);     //执行条件滤波   在半径为0.8 在此半径内必须要有两个邻居点，此点才会保存
 
-
+ viewer.showCloud(cloud_filtered);
 //////////////////////////////////聚類開始
   // Creating the KdTree object for the search method of the extraction
   pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
   tree->setInputCloud (cloud_filtered); //创建点云索引向量，用于存储实际的点云信息
   std::vector<pcl::PointIndices> cluster_indices;
   pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-  ec.setClusterTolerance (0.2); //距離周圍距離 單位m
+  ec.setClusterTolerance (0.3); //距離周圍距離 單位m
   ec.setMinClusterSize (4);//最少點數
   ec.setMaxClusterSize (100);//最大點數
   ec.setSearchMethod (tree);//设置点云的搜索机制
@@ -361,7 +358,7 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
     // std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
     j++;
   }
-  viewer.showCloud(point_show);
+  // viewer.showCloud(point_show);
 /////////////////////////////////////////////////////obj_cloud middle of obj
 
 
@@ -439,18 +436,18 @@ int main(int argc, char *argv[])
   ros::Subscriber velodyne_scan_ = n.subscribe("/velodyne_points", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
 	int count = 0;
 
-    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_y1(new pcl::FieldComparison<pcl::PointXYZ>("y", pcl::ComparisonOps::GT, -5.0f));
-    range_cond->addComparison(cond_y1);
-    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_y2(new pcl::FieldComparison<pcl::PointXYZ>("y", pcl::ComparisonOps::LT, 5.0f));
-    range_cond->addComparison(cond_y2);
-    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_x1(new pcl::FieldComparison<pcl::PointXYZ>("x", pcl::ComparisonOps::GT, -5.0f));
-    range_cond->addComparison(cond_x1);
-    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_x2(new pcl::FieldComparison<pcl::PointXYZ>("x", pcl::ComparisonOps::LT, 5.0f));
-    range_cond->addComparison(cond_x2);
+    // pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_y1(new pcl::FieldComparison<pcl::PointXYZ>("y", pcl::ComparisonOps::GT, -5.0f));
+    // range_cond->addComparison(cond_y1);
+    // pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_y2(new pcl::FieldComparison<pcl::PointXYZ>("y", pcl::ComparisonOps::LT, 5.0f));
+    // range_cond->addComparison(cond_y2);
+    // pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_x1(new pcl::FieldComparison<pcl::PointXYZ>("x", pcl::ComparisonOps::GT, -5.0f));
+    // range_cond->addComparison(cond_x1);
+    // pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_x2(new pcl::FieldComparison<pcl::PointXYZ>("x", pcl::ComparisonOps::LT, 5.0f));
+    // range_cond->addComparison(cond_x2);
 
-    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_z1(new pcl::FieldComparison<pcl::PointXYZ>("z", pcl::ComparisonOps::GT, -0.9f));
+    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_z1(new pcl::FieldComparison<pcl::PointXYZ>("z", pcl::ComparisonOps::GT, -1.2f));
     range_cond->addComparison(cond_z1);
-    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_z2(new pcl::FieldComparison<pcl::PointXYZ>("z", pcl::ComparisonOps::LT, -0.3f));
+    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_z2(new pcl::FieldComparison<pcl::PointXYZ>("z", pcl::ComparisonOps::LT, -0.0f));
     range_cond->addComparison(cond_z2);
 
     //创建滤波器并用条件定义对象初始化

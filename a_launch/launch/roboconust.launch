@@ -1,0 +1,14 @@
+<launch> 
+ <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch" />
+
+  <node pkg="counting" type="ip_camera.py" name="ip"/>
+  <node pkg="counting" type="gogogo_aaa.py" name="couv"/>
+  <node pkg="vision" type="robot_pointcloud" name="robopoint"/>
+  <node name="rosrun" pkg="rviz" type="rviz" args="-f velodyne -d /home/allen/.rviz/default1.rviz"/>
+
+
+  <!--<node name="usb_cam1" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video0" />
+  </node>-->
+
+</launch> 
