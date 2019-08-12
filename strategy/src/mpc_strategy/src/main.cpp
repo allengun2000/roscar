@@ -16,12 +16,13 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "std_msgs/Float32.h"
 #include "geometry_msgs/Pose2D.h"
-
+#include "std_msgs/UInt8.h"
 // for convenience
 using namespace std;
 typedef pcl::PointXYZ VPoint;
 typedef pcl::PointCloud<VPoint> VPointCloud;
 ros::Publisher waypoint_pub;
+ros::Publisher pub_speed_commend;
 geometry_msgs::Point p;
 visualization_msgs::Marker way_point_plot_msg;
 ros::Publisher waypointRef_pub;
@@ -42,8 +43,8 @@ const double Lr = 1.6;
 constexpr double pi() { return M_PI; }
 double deg2rad(double x) { return x * pi() / 180; }
 double rad2deg(double x) { return x * 180 / pi(); }
-
-
+bool need_stop=0;
+double dis_needstop=999;
 // Checks if the SocketIO event has JSON data
 // If there is data the JSON object in string format will be returned,
 // else the empty string "" will be returned.
@@ -73,7 +74,7 @@ double polyeval(Eigen::VectorXd coeffs, double x) {
 }
  void callback2(const std_msgs::Float32::ConstPtr& msg)
 {
-	delta=-deg2rad(msg->data);
+	delta=msg->data;
 }
 Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals,
                         int order) {
@@ -102,6 +103,10 @@ void pointCallback(const VPointCloud::ConstPtr& msg){
     obs_xy[i*2+1]=msg->points[i].x;
     obs_xy[i*2+2]=msg->points[i].y;
   }
+}
+void call_tfstop(const std_msgs::Float64MultiArray::ConstPtr& msg){
+need_stop=msg->data[0];
+dis_needstop=msg->data[1];
 }
 void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
   MPC mpc;
@@ -154,6 +159,8 @@ void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25)] instead of [-1, 1].
 
           // double steer_value = solution[0] / (deg2rad(25)*Lf);
+
+          //////////////////////////////////////////////////////cmd here
           double steer_value = solution[0];
           double throttle_value = solution[1]; //a
           geometry_msgs::Pose2D cmd_msg;
@@ -161,6 +168,27 @@ void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
           cmd_msg.y=3;
           cmd_msg.theta=(-rad2deg(steer_value) +40)* (720+ 720)/(40 +40) -720;
           cmd_pub.publish(cmd_msg);
+          ///////////////////////////////speed cmd
+
+          std_msgs::UInt8 speed_commend;
+          if(need_stop==0){
+          if (fabs(steer_value) > 360) {
+              speed_commend.data = 190;
+          } else if (fabs(steer_value) > 120) {
+              speed_commend.data = 200;
+          } else {
+              speed_commend.data = 220;
+          }
+          }else{
+            if(dis_needstop<16){
+                speed_commend.data = 0;
+            }else{
+              speed_commend.data = 170;
+            }
+          }
+          pub_speed_commend.publish(speed_commend);
+
+
           //Display the waypoints/reference line
           vector<double> next_x_vals;
           vector<double> next_y_vals;
@@ -169,7 +197,7 @@ void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
           // the points in the simulator are connected by a Yellow line
 
           int num_points = 25;
-          double ploy_inc = 0.2;
+          double ploy_inc = 0.8;
                     way_point_plot_msg.points.clear();
           for (int i = 1; i < num_points; i++) {
             next_x_vals.push_back(i*ploy_inc);
@@ -209,9 +237,12 @@ int main(int argc, char *argv[]) {
   	ros::init(argc, argv, "MPC_control");
 	ros::NodeHandle n;
 	ros::Rate loop_rate(10);
-waypoint_pub = n.advertise<visualization_msgs::Marker>("waypoint_mpc", 0);
-waypointRef_pub = n.advertise<visualization_msgs::Marker>("ref_waypoint_mpc", 0);
+
+  waypoint_pub = n.advertise<visualization_msgs::Marker>("waypoint_mpc", 0);
+  waypointRef_pub = n.advertise<visualization_msgs::Marker>("ref_waypoint_mpc", 0);
+  pub_speed_commend =n.advertise<std_msgs::UInt8>("/to_duino_gas", 1000);
 	cmd_pub = n.advertise<geometry_msgs::Pose2D>("/cmd",1000);
+
   way_point_plot_msg.header.frame_id =  "base_link";
   way_point_plot_msg.header.stamp =ros::Time::now();
   way_point_plot_msg.ns = "lane_lines_marker";
@@ -236,6 +267,7 @@ way_pointRef_plot_msg.color.b=0;
 	ros::Subscriber sub = n.subscribe("Do_you_like_ice_cream", 10, waypoint_callback);
 	ros::Subscriber sub2 = n.subscribe("/wheelFB", 1000, callback2);
   ros::Subscriber sub3 = n.subscribe("/current_velocity", 1000, callback3);
+  ros::Subscriber sub4 = n.subscribe("Tf_light_info", 10, call_tfstop);
   ros::Subscriber velodyne_scan_ = n.subscribe("/allen_point", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
   // uWS::Hub h;
   // MPC is initialized here!

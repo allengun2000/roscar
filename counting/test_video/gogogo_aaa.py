@@ -36,6 +36,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 # Name of the directory containing the object detection module we're using
 MODEL_NAME = 'inference_graph'
+MODEL_NAME = 'ssd_mobilenet_v1_coco_11_06_2017'
 IMAGE_NAME = 'night1.avi'
 
 # Grab path to current working directory
@@ -44,6 +45,7 @@ CWD_PATH = os.getcwd()
 # Path to frozen detection graph .pb file, which contains the model that is used
 # for object detection.
 PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'/home/allen/linux/catkin_ws/src/counting/test_video/inference_graph/frozen_inference_graph.pb')
+PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'/home/allen/linux/catkin_ws/src/counting/test_video/ssd_mobilenet_v1_coco_11_06_2017/frozen_inference_graph.pb')
 density_model = model_from_json(open('/home/allen/linux/catkin_ws/src/counting/test_video/model.json').read())
 density_model.load_weights('/home/allen/linux/catkin_ws/src/counting/test_video/CSRNET.h5')
 # Path to label map file
@@ -133,8 +135,8 @@ image_sub = rospy.Subscriber("cam0/image_raw", Image,imcallback)
 frame=cv2.imread("/home/allen/1.png")
 
 while not rospy.is_shutdown():
-    image_expanded = np.expand_dims(frame, axis=0)
     frame_=frame.copy()
+    image_expanded = np.expand_dims(frame_, axis=0)
     frame_ = cv2.resize(frame_, (1920, 1080), interpolation=cv2.INTER_CUBIC)
     # Perform the actual detection by running the model with the image as input
     (boxes, scores, classes, num) = sess.run(
@@ -142,7 +144,7 @@ while not rospy.is_shutdown():
             feed_dict={image_tensor: image_expanded})
     # ymin xmim ymax xmax
     # Draw the results of the detection (aka 'visulaize the results')
-    density_cut1 = frame_[0:540,0:1920] 
+    density_cut1 = frame_[50:540,0:1920] 
     
     density_cut2 = frame_[0:540,0:1920] 
     density_cut1 = cv2.cvtColor(density_cut1, cv2.COLOR_BGR2GRAY)
@@ -152,13 +154,19 @@ while not rospy.is_shutdown():
     # cv2.imshow('Object detector', density)
     
     cv2.waitKey(1)
-    density = np.reshape(density, (1, 540, 1920, 1), order="F")
+    density = np.reshape(density, (1, 490, 1920, 1), order="F")
     density_map=density_model.predict(density)
-    density_map = density_map.reshape(135, 480)
+    density_map = density_map.reshape(122, 480)
     density_count = np.sum(density_map)
-    density_count = int(density_count)                    
+    density_count = int(density_count)  
+
+    density_map = cv2.resize(density_map, (1920, 488), interpolation=cv2.INTER_CUBIC)
+    zeros = np.zeros((52,1920))
+    zeros = zeros.astype(np.uint8)
+    density_fusion = np.vstack((zeros,density_map))
+                  
     density_fusion = cv2.resize(density_map, (1920, 540), interpolation=cv2.INTER_CUBIC)
-    cv2.imwrite('density_fusion.bmp',density_fusion*255)
+    misc.imsave('density_fusion.bmp',density_fusion)	
 
     density_color = cv2.imread("density_fusion.bmp", cv2.IMREAD_GRAYSCALE)
     density_color = cv2.applyColorMap(density_color, cv2.COLORMAP_JET)
@@ -173,7 +181,7 @@ while not rospy.is_shutdown():
     num = scores[0]
     for i in range(len(num)):
         if num[i] > score_thresh:
-            detection_count = detection_count+1
+            
             
             cc = boxes[0]
             for i in range(detection_count):
@@ -182,9 +190,11 @@ while not rospy.is_shutdown():
                 ymax = cc[i,2]*1080   #ymax
                 xmax = cc[i,3]*1920   #xmax 
                 center = float((ymin+ymax)/2)
-                if center > 540:
-                    cv2.rectangle(frame_, (int(xmin), int(ymin)), (int(xmax),  int(ymax)), (255, 0, 0), 2)  
-            
+                #if center > 540:
+		detection_count = detection_count+1
+                cv2.rectangle(frame_, (int(xmin), int(ymin)), (int(xmax),  int(ymax)), (255, 0, 0), 2)  
+
+
             text = "Count:"+str(detection_count)
     #cv2.putText(src, text, (5, 30), cv2.FONT_HERSHEY_PLAIN, 2.0, (0, 0, 255), 2)   
     #src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)

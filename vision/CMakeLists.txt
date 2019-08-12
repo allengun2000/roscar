@@ -27,7 +27,7 @@ find_package(OpenCV)
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-std=gnu++0x)
 endif()
-
+SET (CMAKE_CXX_FLAGS "-std=c++0x")
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in

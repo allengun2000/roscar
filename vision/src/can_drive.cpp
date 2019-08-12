@@ -231,8 +231,8 @@ double car_weight=0.5;
 double car_height=0.5;
 double z=0;
     pcl::PointXYZI point_road;
-for(double x=0;x<20;x=x+0.5){
-  for(double y=-6;y<7;y=y+0.5){
+for(double x=0;x<20;x=x+0.3){
+  for(double y=-6;y<7;y=y+0.3){
     z=0;
     for(int i=0;i< point_show->points.size();i++){
       car_x=point_show->points[i].x;
@@ -240,8 +240,10 @@ for(double x=0;x<20;x=x+0.5){
       z=z+exp(-(((x-car_x)*cos(theta)-(y-car_y)*sin(theta))/car_weight)*(((x-car_x)*cos(theta)-(y-car_y)*sin(theta))/car_weight))* 
         exp(-(((y-car_y)*cos(theta)+(x-car_x)*sin(theta))/car_height)*(((y-car_y)*cos(theta)+(x-car_x)*sin(theta))/car_height));
     }
+    if(z>0.3){
     point_road.x=x;point_road.y=y;point_road.z=z;point_road.intensity=z;
     road_cango_model->points.push_back(point_road);
+    }
   }
 }
 
@@ -249,10 +251,10 @@ for(double x=0;x<20;x=x+0.5){
     // point_show->points.push_back(point_road);
 
   // pass along original time stamp and frame ID
-  point_show->header.stamp = msg->header.stamp;
-  point_show->header.frame_id = msg->header.frame_id;
+  road_cango_model->header.stamp = msg->header.stamp;
+  road_cango_model->header.frame_id = msg->header.frame_id;
   if (point_pub.getNumSubscribers() > 0) {
-    point_pub.publish(point_show);
+    point_pub.publish(road_cango_model);
   }
 
 }

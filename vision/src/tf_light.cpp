@@ -16,6 +16,7 @@
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/segmentation/sac_segmentation.h>
 #include <std_msgs/Float64MultiArray.h>
+#include <math.h>
 using namespace pcl;
 using namespace pcl::io;
 using namespace std;
@@ -30,6 +31,7 @@ Mat1b mask;Mat1b mask2;
 Mat1b red_light,greenlight;
 std::vector<double> HSV;
 ros::Publisher point_pub;
+ros::Publisher disdanger_pub;
 VPointCloud alln_point_msg;  
 float tfl_x=0,tfl_y=0;  
 
@@ -40,6 +42,7 @@ float angle = 2;
 int Kx = 640;
 int Ky = 2000;
 int y_start=99999;
+bool light_sign=0;
 // rosbag play -s 23 -u 9 -l tf2.bag 
 // rosbag play -s 23 -u 9 --pause -l tf2.bag
 int dis_model[21][2]={{51,276},
@@ -114,9 +117,8 @@ Mat rf_mat=Main_frame.clone();
     inRange(hsv, Scalar(0, 145, 138), Scalar(5, 255, 255), red_light);
     inRange(hsv, Scalar(42, 145, 69), Scalar(90, 255, 255), greenlight);
 if(msg->data[0]==4){
-    for(int i=0;i<21;i++){
-  if(  msg->data[1]<dis_model[i][0] && msg->data[1]>dis_model[i+1][0]){
-//////////////
+    for(int i=0;i<21;i++){ //dismode總共21比資料
+  if(  msg->data[1]<dis_model[i][0] && msg->data[1]>dis_model[i+1][0]){ //////算比較遠的紅綠燈
     for(int k=370;k<604;k++){
     for(int j=dis_model[i+1][1]-10;j<dis_model[i][1]+10;j++){
         // redcount=(red_light.at<uchar>(i,j)==255)?redcount+1:redcount;
@@ -132,43 +134,58 @@ if(msg->data[0]==4){
     }
     if(redcount>greencount){
       rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
+      light_sign=1;
     }else if(redcount==0 && greencount==0){
       rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(255,0,0), 1);
+      light_sign=0;
     }else{
       rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,255,0), 1);
+      light_sign=0;
     }
   }
   }
-      for(int i=0;i<21;i++){
-  if(  msg->data[4]<dis_model[i][0] && msg->data[4]>dis_model[i+1][0]){//////
-    for(int k=185;k<370;k++){
-    for(int j=dis_model[i+1][1]-10;j<dis_model[i][1]+10;j++){
-        if(red_light.at<uchar>(j,k)==255){
+
+std_msgs::Float64MultiArray rad_light_msg; //[radlight 1 gogo0  dis disx]
+rad_light_msg.data.resize(3);
+rad_light_msg.data[1]=sqrt(pow(msg->data[1], 2) + pow(msg->data[2], 2));
+rad_light_msg.data[2]=msg->data[1];
+  //////////////////////////////////////////////////////////////////////////
+      for(int i=0;i<21;i++){ //dismode總共21比資料
+  if(  msg->data[4]<dis_model[i][0] && msg->data[4]>dis_model[i+1][0]){//////算比較近的紅綠燈
+    for(int k=185;k<370;k++){ //////距離模左右寬度
+    for(int j=dis_model[i+1][1]-10;j<dis_model[i][1]+10;j++){   //////距離模上下寬度
+        if(red_light.at<uchar>(j,k)==255){ //紅燈幾個點
           redcount++;
           red_light.at<uchar>(j,k)=125;}else{
             red_light.at<uchar>(j,k)=50;
           }
-         if(greenlight.at<uchar>(j,k)==255){
+         if(greenlight.at<uchar>(j,k)==255){//綠燈幾個點
           greencount++;
           red_light.at<uchar>(j,k)=200;}
       }
     }
     if(redcount>greencount){
-      rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
+      rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1); //紅燈上色
+      light_sign=1;
     }else if(redcount==0 && greencount==0){
-      rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(255,0,0), 1);
+      rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(255,0,0), 1); //黃燈上色
+      light_sign=0;
     }else{
-      rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,255,0), 1);
+      rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,255,0), 1); //綠燈上色
+      light_sign=0;
     }
   }
   }
+
+      rad_light_msg.data[0]=light_sign;
+    disdanger_pub.publish(rad_light_msg);
 }
+
+//////////////////////////////前後相反id
 if(msg->data[0]==5){
     for(int i=0;i<21;i++){
   if(  msg->data[4]<dis_model[i][0] && msg->data[4]>dis_model[i+1][0])
-
 rectangle(rf_mat, Point(604,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10), Scalar(0,0,255), 1);
-
   }
       for(int i=0;i<21;i++){
   if(  msg->data[1]<dis_model[i][0] && msg->data[1]>dis_model[i+1][0])
@@ -176,7 +193,7 @@ rectangle(rf_mat, Point(185,dis_model[i][1]+10), Point(370,dis_model[i+1][1]-10)
   }
 }
   cv::imshow("line1", rf_mat);
-  cv::imshow("red", red_light);
+  // cv::imshow("red", red_light);
 }
 int main(int argc, char *argv[])
 {
@@ -189,6 +206,7 @@ int main(int argc, char *argv[])
   point_pub = n.advertise<VPointCloud>("allen_point", 1);
   image_transport::ImageTransport it(n);
   image_transport::Subscriber sub_image = it.subscribe("/camera452/image_raw", 1, imageCallback);
+  disdanger_pub = n.advertise<std_msgs::Float64MultiArray>("Tf_light_info", 1);
 	  //  ros::Subscriber velodyne_scan_ = n.subscribe("/points_raw", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
      ros::Subscriber sub1 = n.subscribe("/Can_I_GO_Ma", 10, tf_callback);
 //   image_transport::Publisher pub_image = it.advertise("camera/image", 1);
@@ -224,7 +242,7 @@ while (ros::ok())
 	// cv::imshow("Images", mask);
 	// 		cv::imshow("red", red_light);
   //     cv::imshow("green", greenlight);
-		cv::imshow("line", Main_frame);
+		// cv::imshow("line", Main_frame);
       // cv::imshow("line1", image_roi);
 		// Mat worldtodot;red_light
 		// worldtodot= dis_dot(world);

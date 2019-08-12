@@ -5,7 +5,7 @@
 
 using CppAD::AD;
 
-size_t N = 15;
+size_t N = 30;
 double dt = 0.1;
 
 
