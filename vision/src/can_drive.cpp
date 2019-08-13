@@ -31,12 +31,13 @@ using namespace cv;
 using namespace Eigen; 
 typedef pcl::PointXYZ VPoint;
 typedef pcl::PointCloud<VPoint> VPointCloud;
-pcl::visualization::CloudViewer viewer("Cloud Viewer");
+// pcl::visualization::CloudViewer viewer("Cloud Viewer");
 cv::Mat  Main_frame;
 cv::Mat  image_roi;
 cv::Mat  img;
 std::vector<double> HSV;
 ros::Publisher point_pub;
+ros::Publisher hill_pub;
 pcl::PointCloud<pcl::PointXYZI>::Ptr alln_point_msg(new pcl::PointCloud<pcl::PointXYZI>); 
 VPointCloud::Ptr obs_msg(new VPointCloud); 
 // rosbag play -s 23 -u 9 -l tf2.bag 
@@ -231,6 +232,10 @@ double car_weight=0.5;
 double car_height=0.5;
 double z=0;
     pcl::PointXYZI point_road;
+
+    point_road.x=3;point_road.y=0;point_road.z=z;point_road.intensity=z;
+    point_show->points.push_back(point_road);
+
 for(double x=0;x<20;x=x+0.3){
   for(double y=-6;y<7;y=y+0.3){
     z=0;
@@ -247,14 +252,16 @@ for(double x=0;x<20;x=x+0.3){
   }
 }
 
-    // point_road.x=3;point_road.y=0;point_road.z=z;point_road.intensity=z;
-    // point_show->points.push_back(point_road);
+
 
   // pass along original time stamp and frame ID
+  point_show->header.stamp = msg->header.stamp;
+  point_show->header.frame_id = msg->header.frame_id;
   road_cango_model->header.stamp = msg->header.stamp;
   road_cango_model->header.frame_id = msg->header.frame_id;
   if (point_pub.getNumSubscribers() > 0) {
-    point_pub.publish(road_cango_model);
+    point_pub.publish(point_show);
+    hill_pub.publish(road_cango_model);
   }
 
 }
@@ -268,7 +275,8 @@ int main(int argc, char *argv[])
 	ros::NodeHandle n;
 	ros::Rate loop_rate(100);
   point_pub = n.advertise<VPointCloud>("allen_point", 1);
-	ros::Subscriber velodyne_scan_ = n.subscribe("/points_raw", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
+  hill_pub = n.advertise<VPointCloud>("/hill_point", 1);
+	ros::Subscriber velodyne_scan_ = n.subscribe("/points_calibrated", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
   sensor_msgs::ImagePtr msg_image;
 	int count = 0;
 while (ros::ok())

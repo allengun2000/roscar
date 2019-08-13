@@ -5,13 +5,13 @@
 
 using CppAD::AD;
 
-size_t N = 30;
-double dt = 0.1;
+size_t N = 15;
+double dt = 0.25;
 
 
 const double Lf = 1.2;
 const double Lr = 1.6;
-double ref_v = 80;
+double ref_v = 3;
 
 size_t x_start = 0;
 size_t y_start = x_start + N;
@@ -36,7 +36,9 @@ class FG_eval {
     for (int i = 0; i < N; i++) {
       fg[0] += (100 + i * 10) * CppAD::pow(vars[cte_start + i], 2);
       fg[0] += (100 + i * 10) * CppAD::pow(vars[epsi_start + i], 2);
-      fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2); 
+
+      fg[0] += 100*CppAD::pow(vars[v_start + i] - ref_v, 2); 
+      // fg[0] += 100*CppAD::abs(vars[v_start + i]*vars[delta_start + i]); 
     }
 
     // Minimize actuator use
@@ -56,7 +58,7 @@ class FG_eval {
     double theta=0;
     double car_weight=0.5;
     double car_height=0.5;
-    for (int i = 0; i < N - 1; i++) {
+    for (int i = 0; i < N ; i++) {
       for(int j=0 ; j<road_obsPeak[0] ; j++){
             car_x=road_obsPeak[j*2+1];
             car_y=road_obsPeak[j*2+2];
@@ -236,6 +238,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs ,std::ve
   for (size_t i = 0; i < N-1; i++) {
     result.push_back(solution.x[x_start + i]);
     result.push_back(solution.x[y_start + i]);
+    // cout<<"v"<<solution.x[v_start+ i]<<endl;
   }
 
   return result;

@@ -164,7 +164,7 @@ void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
           double steer_value = solution[0];
           double throttle_value = solution[1]; //a
           geometry_msgs::Pose2D cmd_msg;
-          cout<<"th"<<rad2deg(steer_value)<<"  v"<<throttle_value<<endl;
+          cout<<"steer"<<rad2deg(steer_value)<<"  oil"<<throttle_value<<endl;
           cmd_msg.y=3;
           cmd_msg.theta=(-rad2deg(steer_value) +40)* (720+ 720)/(40 +40) -720;
           cmd_pub.publish(cmd_msg);
@@ -172,13 +172,17 @@ void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
 
           std_msgs::UInt8 speed_commend;
           if(need_stop==0){
-          if (fabs(steer_value) > 360) {
-              speed_commend.data = 190;
-          } else if (fabs(steer_value) > 120) {
-              speed_commend.data = 200;
-          } else {
-              speed_commend.data = 220;
-          }
+          ///mpc plan a
+              speed_commend.data=25*throttle_value+195;
+          /////plan b
+          // if (fabs(cmd_msg.theta) > 360) {
+          //     speed_commend.data = 190;
+          // } else if (fabs(cmd_msg.theta) > 120) {
+          //     speed_commend.data = 200;
+          // } else {
+          //     speed_commend.data = 220;
+          // }
+          //////
           }else{
             if(dis_needstop<16){
                 speed_commend.data = 0;
@@ -197,7 +201,7 @@ void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
           // the points in the simulator are connected by a Yellow line
 
           int num_points = 25;
-          double ploy_inc = 0.8;
+          double ploy_inc = 0.4;
                     way_point_plot_msg.points.clear();
           for (int i = 1; i < num_points; i++) {
             next_x_vals.push_back(i*ploy_inc);
