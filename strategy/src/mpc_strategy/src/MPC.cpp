@@ -6,8 +6,8 @@
 using CppAD::AD;
 
 size_t N = 15;
-double dt = 0.25;
-
+// double dt = 0.25;
+double dt = 0.1;
 
 const double Lf = 1.2;
 const double Lr = 1.6;
@@ -49,7 +49,7 @@ class FG_eval {
 
     // Minimize actuator change
     for (int i = 0; i < N - 2; i++) {
-      fg[0] += 3000 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i] , 2);
+      fg[0] += 10000 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i] , 2);
       fg[0] += 10 * CppAD::pow(vars[a_start + i + 1] - vars[a_start + i] , 2);
     }
     // road can go

@@ -17,6 +17,7 @@
 #include "std_msgs/Float32.h"
 #include "geometry_msgs/Pose2D.h"
 #include "std_msgs/UInt8.h"
+#include "std_msgs/Bool.h"
 // for convenience
 using namespace std;
 typedef pcl::PointXYZ VPoint;
@@ -27,6 +28,7 @@ geometry_msgs::Point p;
 visualization_msgs::Marker way_point_plot_msg;
 ros::Publisher waypointRef_pub;
 ros::Publisher cmd_pub;
+ros::Publisher break_pub;
 visualization_msgs::Marker way_pointRef_plot_msg;
 std::vector<double> obs_xy;
           std::vector<double> ptsx;
@@ -123,7 +125,7 @@ void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
 
 
 ///////////////////////////  Sumulate control delay
-          double latency = 0.1;
+          double latency = 0;
         double beta = atan((Lr / (Lr + Lf)) * tan(delta));
         psi = psi + (v / Lf) * sin(beta) * latency;
         px = px + v * cos(psi+beta) * latency;
@@ -171,27 +173,36 @@ void waypoint_callback(const std_msgs::Float64MultiArray::ConstPtr& msg){
           ///////////////////////////////speed cmd
 
           std_msgs::UInt8 speed_commend;
+          // std_msgs::Bool break_com;
           if(need_stop==0){
           ///mpc plan a
-              speed_commend.data=25*throttle_value+195;
+              // speed_commend.data=25*throttle_value+195;
+              // speed_commend.data=180;
           /////plan b
-          // if (fabs(cmd_msg.theta) > 360) {
-          //     speed_commend.data = 190;
-          // } else if (fabs(cmd_msg.theta) > 120) {
-          //     speed_commend.data = 200;
-          // } else {
-          //     speed_commend.data = 220;
-          // }
+          if (fabs(cmd_msg.theta) > 360) {
+              speed_commend.data = 190;
+          } else if (fabs(cmd_msg.theta) > 120) {
+              speed_commend.data = 200;
+          } else {
+              speed_commend.data = 220;
+          }
           //////
           }else{
-            if(dis_needstop<16){
+             if(dis_needstop>18){
+               speed_commend.data = 220;
+               cout<<"fastfastfast"<<endl;
+           
+           }else if(dis_needstop<7){
                 speed_commend.data = 0;
+                cout<<"000000000000000000000000000slowwwwwwwwwwwwwwwwwwwwwwwwwwwww"<<endl;
+                // break_com.data=1;
             }else{
               speed_commend.data = 170;
+              cout<<"170170170170170170slowwwwwwwwwwwwwwwwwwwwwwwwwwwww"<<endl;
             }
           }
           pub_speed_commend.publish(speed_commend);
-
+          // break_pub.publish(break_com);
 
           //Display the waypoints/reference line
           vector<double> next_x_vals;
@@ -240,13 +251,13 @@ int main(int argc, char *argv[]) {
   /////***************ros
   	ros::init(argc, argv, "MPC_control");
 	ros::NodeHandle n;
-	ros::Rate loop_rate(10);
+	ros::Rate loop_rate(100);
 
   waypoint_pub = n.advertise<visualization_msgs::Marker>("waypoint_mpc", 0);
   waypointRef_pub = n.advertise<visualization_msgs::Marker>("ref_waypoint_mpc", 0);
   pub_speed_commend =n.advertise<std_msgs::UInt8>("/to_duino_gas", 1000);
-	cmd_pub = n.advertise<geometry_msgs::Pose2D>("/cmd",1000);
-
+  cmd_pub = n.advertise<geometry_msgs::Pose2D>("/cmd",1000);
+  break_pub = n.advertise<std_msgs::Bool>("/to_duino_braker",1000);
   way_point_plot_msg.header.frame_id =  "base_link";
   way_point_plot_msg.header.stamp =ros::Time::now();
   way_point_plot_msg.ns = "lane_lines_marker";

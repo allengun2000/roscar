@@ -142,8 +142,8 @@ void pointCallback(const VPointCloud::ConstPtr& msg)
  /////////////////// 找出平面的垂直向量並且校正
 pcl::ConditionAnd<pcl::PointXYZ>::Ptr range_cond(new pcl::ConditionAnd<pcl::PointXYZ>);
     pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_z1(new pcl::FieldComparison<pcl::PointXYZ>("z", pcl::ComparisonOps::GT, 0.1f));
-    range_cond->addComparison(cond_z1);
-    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_z2(new pcl::FieldComparison<pcl::PointXYZ>("z", pcl::ComparisonOps::LT, 3.0f));
+    // range_cond->addComparison(cond_z1);
+    pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_z2(new pcl::FieldComparison<pcl::PointXYZ>("z", pcl::ComparisonOps::LT, 1.5f));
     range_cond->addComparison(cond_z2);
     pcl::FieldComparison<pcl::PointXYZ>::ConstPtr cond_y1(new pcl::FieldComparison<pcl::PointXYZ>("y", pcl::ComparisonOps::GT, -6.0f));
     range_cond->addComparison(cond_y1);
@@ -233,8 +233,8 @@ double car_height=0.5;
 double z=0;
     pcl::PointXYZI point_road;
 
-    point_road.x=3;point_road.y=0;point_road.z=z;point_road.intensity=z;
-    point_show->points.push_back(point_road);
+    // point_road.x=3;point_road.y=0;point_road.z=z;point_road.intensity=z;
+    // point_show->points.push_back(point_road);
 
 for(double x=0;x<20;x=x+0.3){
   for(double y=-6;y<7;y=y+0.3){
@@ -276,7 +276,7 @@ int main(int argc, char *argv[])
 	ros::Rate loop_rate(100);
   point_pub = n.advertise<VPointCloud>("allen_point", 1);
   hill_pub = n.advertise<VPointCloud>("/hill_point", 1);
-	ros::Subscriber velodyne_scan_ = n.subscribe("/points_calibrated", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
+	ros::Subscriber velodyne_scan_ = n.subscribe("/points_raw", 10, pointCallback, ros::TransportHints().tcpNoDelay(true));
   sensor_msgs::ImagePtr msg_image;
 	int count = 0;
 while (ros::ok())
