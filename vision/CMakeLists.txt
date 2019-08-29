@@ -27,7 +27,8 @@ find_package(OpenCV)
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-std=gnu++0x)
 endif()
-SET (CMAKE_CXX_FLAGS "-std=c++0x")
+# SET (CMAKE_CXX_FLAGS "-std=c++0x")
+set(CMAKE_CXX_FLAGS "-O3 -g -Wall ${CMAKE_CXX_FLAGS}")
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in
@@ -256,12 +257,19 @@ add_dependencies(pcl_sub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_T
 target_link_libraries(pcl_sub
   ${catkin_LIBRARIES}
 )
-
 add_executable(can_drive
   src/can_drive.cpp
 )
 add_dependencies(can_drive ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(can_drive
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
+add_executable(pot_img_map
+  src/pcl_image_map.cpp
+)
+add_dependencies(pot_img_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(pot_img_map
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )

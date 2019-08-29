@@ -13,10 +13,11 @@ import argparse
 
 
 
-URL = "rtsp://admin:1234@192.168.1.30:50/ipcam_mjpeg.sdp"
-URL1 = "rtsp://admin:1234@192.168.1.7:554/ipcam_mjpeg.sdp"
-
-
+URL1 = "rtsp://admin:1234@192.168.1.3/ipcam_mjpeg.sdp"
+URL = "rtsp://admin:1234@192.168.1.7/ipcam_mjpeg.sdp"
+# http://admin:1234@192.168.1.7/mjpg/video.mjpg
+# URL = "http://admin:1234@192.168.1.7:80/mjpg/video.mjpg"
+# URL1 = "http://admin:1234@192.168.1.3:8196/mjpg/video.mjpg"
 ipcam = cv2.VideoCapture(URL)
 ipcam1 = cv2.VideoCapture(URL1)
 

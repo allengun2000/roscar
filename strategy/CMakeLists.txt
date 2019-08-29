@@ -13,10 +13,14 @@ find_package(catkin REQUIRED COMPONENTS
 add_definitions(-std=c++11 -O3)
 set(CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS "${CXX_FLAGS}")
+
 set(sources src/mpc_strategy/src/MPC.cpp src/mpc_strategy/src/main.cpp)
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
-include_directories(src/mpc_control/src/Eigen-3.3)
+
+find_package( Eigen3 REQUIRED )
+include_directories( EIGEN3_INCLUDE_DIR )
+# include_directories(src/mpc_control/src/Eigen-3.3)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 

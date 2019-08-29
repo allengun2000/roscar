@@ -12,8 +12,9 @@ import argparse
 
 
 
-URL = "rtsp://admin:1234@192.168.1.3/ipcam_mjpeg.sdp"
-
+URL = "http://admin:1234@192.168.1.3:8196/mjpg/video.mjpg"
+# http://admin:1234@192.168.1.7/mjpg/video.mjpg
+# http://admin:1234@192.168.1.7/snapshot.jpg?user=admin&pwd=1234&strm=0
 
 ipcam = cv2.VideoCapture(URL)
 rospy.init_node('IPCamera', anonymous=True)
